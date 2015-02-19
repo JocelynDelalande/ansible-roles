@@ -1,0 +1,11 @@
+$TTL	604800
+@	IN	SOA	{{ bind_server_name }} {{ bind_admin_name }} (
+			 {{ item.serial }} 		; Serial
+			 604804		; Refresh
+			  86400		; Retry
+			2419200		; Expire
+			 604800 )	; Negative Cache TTL
+;
+{% for record in item.records %}
+{{ record.name }}	IN	{{ record.type }}	{{ record.val }}
+{% endfor %}

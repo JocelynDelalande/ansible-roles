@@ -1,0 +1,79 @@
+lxc.rootfs = /var/lib/lxc/{{ item.name }}/rootfs
+lxc.tty = 4
+lxc.pts = 1024
+lxc.arch = amd64
+lxc.utsname = {{ item.name }}
+lxc.cap.drop = sys_module mac_admin mac_override sys_time
+lxc.network.type = veth
+lxc.network.flags = up
+lxc.network.link = br-dmz
+lxc.network.hwaddr = {{ item.mac }}
+{% if item.lxc.autostart|default(False) %}
+lxc.start.auto = 1
+{% endif %}
+
+# Default policy: deny everything and allow mknod without perms
+lxc.cgroup.devices.deny = a
+lxc.cgroup.devices.allow = c *:* m
+lxc.cgroup.devices.allow = b *:* m
+
+lxc.cgroup.devices.allow = c 1:3 rwm   # /dev/null
+lxc.cgroup.devices.allow = c 1:5 rwm   # /dev/zero
+lxc.cgroup.devices.allow = c 5:1 rwm   # /dev/console
+lxc.cgroup.devices.allow = c 5:0 rwm   # /dev/tty
+lxc.cgroup.devices.allow = c 4:0 rwm   # /dev/tty0
+lxc.cgroup.devices.allow = c 4:1 rwm   # /dev/tty1
+lxc.cgroup.devices.allow = c 1:9 rwm   # /dev/urandom
+lxc.cgroup.devices.allow = c 1:8 rwm   # /dev/random
+lxc.cgroup.devices.allow = c 5:2 rwm   # /dev/ptmx
+lxc.cgroup.devices.allow = c 254:0 rwm  # /dev/rtc0
+lxc.cgroup.devices.allow = c 136:* rwm # /dev/pts*
+
+{% if 'pts' in item.lxc.features|default([]) %}
+
+# mounts point
+lxc.mount.entry = devpts dev/pts devpts nosuid,noexec,mode=0620,ptmxmode=000,newinstance 0 0
+
+{% endif %}
+
+
+{% if 'seat' in item.lxc.features|default([]) %}
+lxc.mount.entry = /dev/dri dev/dri none bind,optional,create=dir
+lxc.mount.entry = /dev/input dev/input none bind,optional,create=dir
+
+lxc.cgroup.devices.allow = c 226:0 rwm # dev/dri/card0
+lxc.cgroup.devices.allow = c 226:64 rwm # dev/dri/controlD64
+lxc.cgroup.devices.allow = c 13:* rwm   # /dev/input/* input devices
+lxc.cgroup.devices.allow = c 5:1 rwm # /dev/console : required to change input method
+
+# 4 TTY = the DM + 3 users
+lxc.cgroup.devices.allow = c 4:7 rwm # dev/tty7
+lxc.cgroup.devices.allow = c 4:8 rwm # dev/tty8
+lxc.cgroup.devices.allow = c 4:9 rwm # dev/tty9
+lxc.cgroup.devices.allow = c 4:10 rwm # dev/tty10
+
+{% endif %}
+
+{% if 'audio' in item.lxc.features|default([]) %}
+lxc.mount.entry = /dev/snd dev/snd none bind,optional,create=dir
+lxc.cgroup.devices.allow = c 116:* rwm # dev/snd*
+{% endif %}
+
+
+{% if item.lxc.distro == 'ubuntu' %}
+lxc.devttydir = lxc
+lxc.cgroup.devices.allow = c 10:228 rwm # /dev/hpet
+lxc.pivotdir = lxc_putold
+lxc.mount.entry = proc proc proc nodev,noexec,nosuid 0 0
+lxc.mount.entry = sysfs sys sysfs defaults 0 0
+lxc.mount.entry = /sys/kernel/debug sys/kernel/debug none bind,optional 0 0
+lxc.mount.entry = /sys/kernel/security sys/kernel/security none bind,optional 0 0
+lxc.mount.entry = /sys/fs/pstore sys/fs/pstore none bind,optional 0 0
+{% endif %}
+
+{% if item.lxc.distro == 'debian' %}{% if item.lxc.version == 'jessie' %}
+lxc.autodev = 1
+lxc.kmsg = 0
+{% endif %}{% endif %}
+
+lxc.seccomp = /usr/share/lxc/config/common.seccomp
