@@ -1,0 +1,20 @@
+- name: Install required packages
+  apt: pkg={{ item }} state=installed
+  with_items:
+    - libasound2
+    - libasound2-plugins
+    - alsa-utils
+    - pulseaudio
+    - pulseaudio-utils
+    - pulseaudio-module-zeroconf
+
+- name: Put pulse init script
+  copy: src=init-pulseaudio.conf dest=/etc/init/pulseaudio.conf
+
+- name: Put default conf
+  template: src=system.pa.j2 dest=/etc/pulse/system.pa
+  notify: restart pulseaudio
+
+- name: Ensures pulseaudio daemon is enabled
+  service: name=pulseaudio enabled=yes
+  notify: restart pulseaudio
