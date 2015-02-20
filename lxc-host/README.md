@@ -41,6 +41,7 @@ Sample site.yml
               features:
                 - seat
 
+          # that host won't be created by lxc-host, as it have no "lxc" var.
           - name: hostname2
             ip4: 192.168.0.2
             mac: cd:cd:cd:cd:cd:cd
