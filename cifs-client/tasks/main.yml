@@ -1,0 +1,19 @@
+- name: Install cifs-utils
+  apt: pkg=cifs-utils state=installed
+
+- name: Install CIFS credentials file
+  template:
+    src: fstab.creds.j2
+    dest: "/etc/fstab.{{ item.name }}.creds"
+    mode: 0600
+    owner: root
+  with_items: cifs_mounts
+
+- name: Ensure CIFS mount is present
+  mount:
+    name: "{{ item.mountpoint }}"
+    src: "{{ item.share_uri }}"
+    fstype: cifs
+    opts: "credentials=/etc/fstab.{{ item.name }}.creds,iocharset=utf8,uid={{ item.localuser }},gid={{ item.localgroup }}"
+    state: mounted
+  with_items: cifs_mounts

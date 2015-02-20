@@ -1,0 +1,24 @@
+- name: Install dnsmasq package
+  apt: pkg=dnsmasq state=installed
+
+- name: Puts the default init dnsmasq file
+  template: src=default-dnsmasq.j2 dest=/etc/default/dnsmasq
+  notify: restart dnsmasq
+
+- name: Puts dnsmasq.conf file
+  template: src=dnsmasq.conf.j2 dest=/etc/dnsmasq.conf
+  notify: restart dnsmasq
+
+- name: Build leases files
+  template: src=ethers.j2 dest=/etc/ethers
+  notify: restart dnsmasq
+
+- name: Build hosts files
+  template: src=hosts.j2 dest=/etc/hosts
+  notify: restart dnsmasq
+
+- name: enable ipv4 routing
+  sysctl: name="net.ipv4.ip_forward" value=1 sysctl_set=yes state=present reload=yes
+
+- name: Make sure dnsmasq starts
+  service: name=dnsmasq state=running enabled=yes
