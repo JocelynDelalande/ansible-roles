@@ -5,6 +5,8 @@ These are my personal ansible roles. I share with joy, and comments are welcome,
 but I don't intend to make them generic nor perfect for everybody use. They suit
 my needs.
 
+Oh, and they all are using Debian systems.
+
 They are licensing under the [WTFPL](http://www.wtfpl.net/txt/copying/)
 
 
