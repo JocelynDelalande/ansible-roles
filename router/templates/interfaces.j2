@@ -1,0 +1,24 @@
+# The loopback network interface
+auto lo
+iface lo inet loopback
+
+# The primary network interface
+#auto eth0
+#iface eth0 inet manual
+
+auto eth0.10
+iface eth0.10 inet dhcp
+
+auto {{ dmz_iface }}
+iface {{ dmz_iface }} inet static
+    bridge_ports eth0.30
+	address {{ dmz_ip4 }}
+	bridge_fd 0
+    bridge_stp off
+    bridge_maxwait 0
+	post-up /sbin/ethtool -K {{ dmz_iface }} tx off rx off
+    # That is ugly but needed : cant have 2 stanzas for same bridge
+    # otherwise the up/down fails.
+    up ip a a {{ dmz_ip6 }} dev {{ dmz_iface }}
+
+

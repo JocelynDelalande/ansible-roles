@@ -1,0 +1,8 @@
+- name: restart networking
+  service: name=networking state=restarted
+
+- name: reload firewall rules
+  command: /etc/network/if-pre-up.d/iptables
+
+- name: reload kernel modules
+  service: name=systemd-modules-load state=restarted

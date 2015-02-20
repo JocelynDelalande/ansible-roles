@@ -1,0 +1,21 @@
+- name: Puts the network interfaces conf in place
+  template: src=interfaces.j2 dest=/etc/network/interfaces
+#  notify: restart networking
+
+- name: Install vlan tools
+  apt: pkg=vlan state=installed
+
+- name: Load vlan module on boot
+  copy: src=vlan-module.conf dest=/etc/modules-load.d/vlan.conf
+  notify: reload kernel modules
+
+- name: Puts on-interface-up script to restore firewall rules
+  copy: src=if-pre-up-iptables dest=/etc/network/if-pre-up.d/iptables mode=744
+
+- name: Set IPv4 firewall rules
+  template: src=iptables.j2 dest=/etc/iptables
+  notify: reload firewall rules
+
+- name: Set IPv6 firewall rules
+  template: src=ip6tables.j2 dest=/etc/ip6tables
+  notify: reload firewall rules
