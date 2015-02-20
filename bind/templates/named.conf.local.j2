@@ -1,0 +1,8 @@
+{% for domain in bind_master_domains %}
+
+zone "{{ domain.name }}" {
+    type master;
+    file "/etc/bind/db.{{ domain.name }}";
+};
+
+{% endfor %}
