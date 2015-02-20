@@ -1,0 +1,15 @@
+interface={{ wifi_iface }}
+bridge={{ dmz_iface }}
+driver=nl80211
+ssid={{ wifi_ssid }}
+hw_mode=g
+channel={{ wifi_channel }}
+macaddr_acl=0
+auth_algs=1 # Nous voulons seulement du chiffré
+wpa=2 # wpa=3 to support both wpa1 and wpa2
+wpa_passphrase={{ wifi_passphrase }}
+wpa_key_mgmt=WPA-PSK
+rsn_pairwise=CCMP
+wpa_pairwise=TKIP
+wme_enabled=1
+ieee80211n=1 # sans cette option, on est bloqué à 11mbps

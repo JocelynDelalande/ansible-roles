@@ -1,0 +1,2 @@
+# to start it in daemon mode
+DAEMON_CONF=/etc/hostapd/hostapd.conf
