@@ -1,0 +1,5 @@
+ympd_clone_dir: /tmp/ympd-ansible
+ympd_build_dir: "{{ ympd_clone_dir }}/build"
+ympd_git_repo: https://github.com/notandy/ympd
+ympd_user: ympd
+ympd_port: 8080

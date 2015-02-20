@@ -1,0 +1,2 @@
+- name: Restart ympd
+  service: name=ympd state=restarted

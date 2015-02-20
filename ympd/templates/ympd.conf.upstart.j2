@@ -1,0 +1,7 @@
+description     "ympd"
+
+start on local-filesystems or runlevel [345]
+stop on runlevel [!345]
+
+
+exec /usr/local/bin/ympd -u {{ ympd_user }} -w {{ ympd_listen_port }}
