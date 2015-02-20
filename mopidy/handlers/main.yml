@@ -1,0 +1,2 @@
+- name: Restart mopidy
+  service: name=mopidy state=restarted

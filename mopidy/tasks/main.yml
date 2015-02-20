@@ -1,0 +1,33 @@
+- include: cifs.yml
+
+- name: Add mopidy APT repository
+  apt_repository: repo='deb http://apt.mopidy.com/ stable main contrib non-free' state=present
+
+- name: Import Mopidy GPG key
+  apt_key: id=271D2943 url=https://apt.mopidy.com/mopidy.gpg state=present
+
+- name: Add Trusty-media PPA
+  apt_repository: repo='ppa:mc3man/trusty-media'
+
+- name: Install mopidy and codecs
+  apt: pkg={{ item }} state=installed update_cache=yes cache_valid_time=3600
+  with_items:
+    - mopidy
+    - gstreamer0.10-ffmpeg # from ppa:mc3man/trusty-media, for wma
+
+- name: Authorize mopidy to play sound over pulse
+  user: name=mopidy groups=pulse-access append=yes
+
+- name: Ensures mopidy daemon is enabled and started
+  service: name=mopidy enabled=yes state=started
+
+- name: Put mopidy conf file
+  template: src=mopidy.conf.j2 dest=/etc/mopidy/mopidy.conf
+  notify: Restart mopidy
+
+- name: Install Musicbox-webclient web interface
+  pip: name=Mopidy-MusicBox-Webclient version=1.0.4
+  notify: Restart mopidy
+
+- name: Put Cron job to rescan library
+  cron: name="rescan mopidy library" minute="*/15" job="mopidyctl -q local scan >/dev/null 2>&1"

@@ -1,0 +1,51 @@
+[mpd]
+hostname = ::
+enabled = true
+
+[logging]
+config_file = /etc/mopidy/logging.conf
+debug_file = /var/log/mopidy/mopidy-debug.log
+
+[local]
+enabled = true
+data_dir = /var/lib/mopidy/local
+media_dir = {{ mopidy_mountpoint }}
+playlists_dir = /var/lib/mopidy/playlists
+excluded_file_extensions =
+  .directory
+  .html
+  .jpeg
+  .jpg
+  .log
+  .nfo
+  .png
+  .txt
+  .sfv
+  .bmp
+  .xls
+  .gp4
+  .pls
+  .cue
+  .pdf
+  .pk
+  .gif
+  .m3u
+  LICENSE
+  info
+  .rtf
+  .m3u
+  .md5
+  .ini
+  .ATF
+  .doc
+  .htm
+  .thumbnail
+
+
+
+[http]
+enabled = true
+port = 6680
+hostname = {{ ansible_default_ipv4.address }}
+static_dir =
+zeroconf = Mopidy sur $hostname

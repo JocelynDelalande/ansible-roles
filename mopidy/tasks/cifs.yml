@@ -1,0 +1,10 @@
+- name: Install cifs-utils
+  apt: pkg=cifs-utils state=installed
+
+- name: Ensure CIFS mount is present
+  mount:
+    name: "{{ mopidy_mountpoint }}"
+    src: "{{ mopidy_share_uri }}"
+    fstype: cifs
+    opts: "username=donotexist,password=foobar,iocharset=utf8,uid=1000"
+    state: mounted
