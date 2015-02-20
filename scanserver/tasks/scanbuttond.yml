@@ -1,0 +1,35 @@
+- name: Install scanbuttond
+  apt: pkg=scanbuttond state=installed
+
+- name: Install conversion tools
+  apt: pkg={{ item }} state=installed
+  with_items:
+    - libtiff-tools
+    - imagemagick
+    - pdftk
+
+- name: Enable scanbuttond via /etc/default
+  template: src=default-scanbuttond.j2 dest=/etc/default/scanbuttond
+  notify: restart scanbuttond
+
+- name: Put init scanbuttond init script
+  template: src=scanbuttond-init.j2 dest=/etc/init.d/scanbuttond mode=0744
+  notify: restart scanbuttond
+
+- name: Make scan directory
+  file:
+    path: "{{ scanbuttond_scan_folder }}"
+    state: directory
+    owner: "{{ scanbuttond_user }}"
+    mode: "{{ scanbuttond_scan_folder_mode }}"
+
+- name: Scanbuttond script
+  template:
+    src: buttonpressed.sh.j2
+    dest: /etc/scanbuttond/buttonpressed.sh
+    mode: 0744
+    owner: "{{ scanbuttond_user }}"
+  notify: restart scanbuttond
+
+- name: Ensures scanbuttond is enabled
+  service: name=scanbuttond enabled=yes

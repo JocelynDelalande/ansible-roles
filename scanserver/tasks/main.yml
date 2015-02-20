@@ -1,0 +1,10 @@
+- name: Install sane utils
+  apt: pkg=sane-utils state=installed
+
+- name: Install propper udev rule
+  action: copy src=80-scanner-permissions.rules dest=/etc/udev/rules.d/80-scanner-permissions.rules
+  notify:
+    - Reload udev rules
+    - WARNING Unplug/replug your scanner to get right permissions
+
+- include: scanbuttond.yml

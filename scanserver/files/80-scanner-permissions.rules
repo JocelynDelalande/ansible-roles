@@ -1,0 +1,2 @@
+# If acl are not used, the integrated udev rule may not work
+ENV{libsane_matched}=="yes", RUN+="/bin/setfacl -m g:scanner:rw $env{DEVNAME}", MODE="0664", GROUP="scanner"

@@ -1,0 +1,133 @@
+#!/bin/bash
+# This script is started by scanbuttond whenever a scanner button has been pressed.
+# Scanbuttond passes the following parameters to us:
+# $1 ... the button number
+# $2 ... the scanner's SANE device name, which comes in handy if there are two or
+#        more scanners. In this case we can pass the device name to SANE programs
+#        like scanimage.
+
+
+set -e
+
+TMPFILE="{{ scanbuttond_tmp_file }}"
+LOCKFILE="{{ scanbuttond_lock_file }}"
+SCAN_FOLDER="{{ scanbuttond_scan_folder }}"
+
+BASE_NAME=`date +%Y-%m-%d-%Hh%M-%S`
+PDF_FILENAME=${SCAN_FOLDER}/scan-${BASE_NAME}.pdf
+JPG_FILENAME=${SCAN_FOLDER}/scan-${BASE_NAME}.jpg
+PS_FILENAME=${SCAN_FOLDER}/scan-${BASE_NAME}.ps
+MERGED_PDF_FILENAME=${SCAN_FOLDER}/multi-scan-${BASE_NAME}.pdf
+PNG_FILENAME=${SCAN_FOLDER}/scan-${BASE_NAME}.png
+BTN_FILE={{ scanbuttond_button_file }}
+DBL_CLICK_DELAY={{ scanbuttond_dbl_click_delay }}
+
+DEVICE=$2
+
+function scan_and_store() {
+        format=$1
+        quality=$2
+        mode=$3     # Color or Gray
+        gamma=$4
+
+        case $gamma in
+                'hc')
+                        gamma="High contrast printing"
+                        ;;
+        esac
+        # TODO: do it via lockfile-create/lockfile-remove
+        if [ -f $LOCKFILE ]; then
+                echo "Error: Another scanning operation is currently in progress or $LOCKFILE is stalled"
+                exit
+        fi
+        touch $LOCKFILE
+        rm -f $TMPFILE
+        scanimage --device-name $DEVICE --format tiff --mode $mode --quick-format A4 \
+                --resolution $quality --sharpness 0 --brightness -3 \
+                --gamma-correction "$gamma" > $TMPFILE
+
+        case $format in
+                'pdf')
+                        tiff2pdf -z -p A4 -j -o $PDF_FILENAME $TMPFILE
+                        ;;
+                'png')
+                        convert $TMPFILE -quality 9 $PNG_FILENAME
+                        ;;
+                'ps')
+                        tiff2ps -z -w 8.27 -h 11.69 -O ${PS_FILENAME} $TMPFILE
+                        ;;
+                'jpg')
+                        convert $TMPFILE -quality 75 $JPG_FILENAME
+                        ;;
+        esac
+        rm -f $LOCKFILE
+}
+
+function merge_and_store() {
+        pdftk $SCAN_FOLDER/scan-`date +%Y-%m-%d`*.pdf cat output $MERGED_PDF_FILENAME
+}
+
+function photocopy() {
+        quality=$1
+        scan_and_store ps $quality Gray "Default"
+        lp ${PS_FILENAME}
+        rm ${PS_FILENAME}
+}
+
+function is_the_second_click() {
+        FILE=${BTN_FILE}-$1
+
+        if [ -f ${FILE} ]; then
+                rm $FILE
+                return 0
+
+        else
+                return 1
+        fi
+}
+
+function is_dblclick() {
+        BUTTON=$1
+        FILE=${BTN_FILE}-$BUTTON
+        touch $FILE
+        sleep $DBL_CLICK_DELAY
+        if [ -f  ${FILE} ]; then
+                # No one removed the file : it's a simple click
+                rm $FILE
+                return 1
+        else
+                return 0
+        fi
+}
+
+function handle_dblclick() {
+        btn=$1
+        action_click=$2
+        action_dblclick=$3
+
+        if is_the_second_click $btn; then
+                echo "the second click"
+        else
+                if is_dblclick $btn; then
+                        $action_dblclick
+                else
+                        $action_click
+                fi
+        fi
+
+}
+
+case $1 in
+{% for i in scanbuttond_actions %}
+        {{ i.button }})
+                echo "button {{ i.button }} has been pressed on $2"
+                {% if i.dblclick_action is defined %}
+                handle_dblclick $1 "{{ i.click_action }}" "{{ i.dblclick_action }}"&
+                {% else %}
+                {{ i.click_action }}
+                {% endif %}
+                ;;
+{% endfor %}
+esac
+
+chmod -f {{ scanbuttond_output_mode }} $PDF_FILENAME $JPG_FILENAME $PS_FILENAME $MERGED_PDF_FILENAME $PNG_FILENAME || /bin/true

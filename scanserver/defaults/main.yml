@@ -1,0 +1,20 @@
+scanbuttond_user: saned
+scanbuttond_opts: "-r 500000"
+scanbuttond_tmp_file: /tmp/button-scanned.tif
+scanbuttond_lock_file: /tmp/copy.lock
+scanbuttond_button_file: /tmp/scan-btn
+scanbuttond_scan_folder: /var/scan/
+scanbuttond_dbl_click_delay: 1
+scanbuttond_output_mode: 0744
+scanbuttond_scan_folder_mode: 777
+scanbuttond_actions:
+  - button: 1
+    click_action: scan_and_store pdf 75 Gray hc
+    dblclick_action: merge_and_store
+  - button: 2
+    click_action: scan_and_store jpg 300 Color Default
+    dblclick_action: scan_and_store png 300 Color Default
+  - button: 3
+    click_action: scan_and_store png 900 Color "Default"
+  - button: 4
+    click_action: photocopy 600

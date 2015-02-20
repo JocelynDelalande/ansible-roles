@@ -1,0 +1,8 @@
+- name: restart scanbuttond
+  service: name=scanbuttond state=restarted
+
+- name: Reload udev rules
+  command: udevadm control --reload-rules
+
+- name: WARNING Unplug/replug your scanner to get right permissions
+  command: /bin/true
