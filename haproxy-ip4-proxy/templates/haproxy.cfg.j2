@@ -1,0 +1,115 @@
+global
+	log /dev/log	local0
+	log /dev/log	local1 notice
+	chroot /var/lib/haproxy
+	stats socket /run/haproxy/admin.sock mode 660 level admin
+	stats timeout 30s
+	user haproxy
+	group haproxy
+	daemon
+
+	# Default SSL material locations
+	#ca-base /etc/ssl/certs
+	#crt-base /etc/ssl/private
+
+	# Default ciphers to use on SSL-enabled listening sockets.
+	# For more information, see ciphers(1SSL).
+	ssl-default-bind-ciphers kEECDH+aRSA+AES:kRSA+AES:+AES256:RC4-SHA:!kEDH:!LOW:!EXP:!MD5:!aNULL:!eNULL
+        ssl-default-bind-options no-sslv3
+
+defaults
+	log	global
+	mode	http
+	option	httplog
+	option	dontlognull
+        timeout connect 5000
+        timeout client  50000
+        timeout server  50000
+	errorfile 400 /etc/haproxy/errors/400.http
+	errorfile 403 /etc/haproxy/errors/403.http
+	errorfile 408 /etc/haproxy/errors/408.http
+	errorfile 500 /etc/haproxy/errors/500.http
+	errorfile 502 /etc/haproxy/errors/502.http
+	errorfile 503 /etc/haproxy/errors/503.http
+	errorfile 504 /etc/haproxy/errors/504.http
+
+frontend ssl_relay 0.0.0.0:443
+    # this only works with 1.5 haproxy
+    mode tcp
+    option tcplog
+    option socket-stats
+    # option nolinger
+    maxconn  300
+
+    # use tcp content accepts to detects ssl client and server hello.
+    # acl clienthello req_ssl_hello_type 1 -> seems to not work
+
+    tcp-request inspect-delay 5s
+    tcp-request content accept if { req_ssl_hello_type 1 }
+
+    {% for name in ipv4_proxies %}
+    use_backend ssl_{{ name }} if { req_ssl_sni -i {{ name }} }
+    {% endfor %}
+
+    default_backend ssl_{{ default_cert }}
+
+frontend http_proxy
+        bind 0.0.0.0:80
+        mode http
+        option forwardfor
+        option http-server-close
+        option http-pretend-keepalive
+
+        {% for name in ipv4_proxies %}
+        acl is_{{ name }} hdr_end(host) -i {{ name }}
+        use_backend http_{{ name }} if is_{{ name }}
+        {% endfor %}
+
+        default_backend http_{{ default_cert }}
+
+{% for name in ipv4_proxies %}
+
+backend http_{{ name }}
+        mode http
+        timeout connect 5s
+        timeout server 5m
+        balance roundrobin
+        server x_http_{{ name }} {{ name }}:80
+
+
+backend ssl_{{ name }}
+   mode tcp
+
+   #option nolinger
+   option tcplog
+   balance roundrobin
+   hash-type consistent
+   option srvtcpka
+
+    # maximum SSL session ID length is 32 bytes.
+    stick-table type binary len 32 size 30k expire 30m
+
+    # make sure we cover type 1 (fallback)
+    acl clienthello req_ssl_hello_type 1
+    acl serverhello rep_ssl_hello_type 2
+
+    # use tcp content accepts to detects ssl client and server hello.
+    tcp-request inspect-delay 5s
+    tcp-request content accept if clienthello
+
+    # no timeout on response inspect delay by default.
+    tcp-response content accept if serverhello
+
+    # SSL session ID (SSLID) may be present on a client or server hello.
+    # Its length is coded on 1 byte at offset 43 and its value starts
+    # at offset 44.
+    # Match and learn on request if client hello.
+    stick on payload_lv(43,1) if clienthello
+
+    # Learn on response if server hello.
+    stick store-response payload_lv(43,1) if serverhello
+
+    #option ssl-hello-chk
+    server x_{{ name }} {{ name }}:443
+
+{% endfor %}
