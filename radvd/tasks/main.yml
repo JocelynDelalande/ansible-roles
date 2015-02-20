@@ -1,0 +1,12 @@
+- name: Install radvd package
+  apt: pkg=radvd state=installed
+
+- name: Puts the vpn conf in place
+  template: src=radvd.conf.j2 dest=/etc/radvd.conf
+  notify: restart radvd
+
+- name: enable ipv6 routing
+  sysctl: name="net.ipv6.conf.all.forwarding" value=1 sysctl_set=yes state=present reload=yes
+
+- name: Make sure radvd starts
+  service: name=radvd state=running enabled=yes

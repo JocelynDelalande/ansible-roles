@@ -1,0 +1,12 @@
+interface {{ radvd_iface }}
+{
+   AdvSendAdvert on;
+   AdvOtherConfigFlag on;
+   prefix {{ radvd_block_64 }}
+   {
+      AdvOnLink on;
+       AdvAutonomous on;
+       AdvValidLifetime 2592000;
+       AdvPreferredLifetime 604800;
+   };
+};
