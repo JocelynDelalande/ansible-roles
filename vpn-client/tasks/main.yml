@@ -1,0 +1,19 @@
+- name: Install openvpn package
+  apt: pkg=openvpn state=installed
+
+- name: Puts the vpn conf in place
+  template: src=vpn-client.conf.j2 dest=/etc/openvpn/{{ vpn_name }}-client.conf
+  notify: restart openvpn
+
+- name: Puts networking up script in place
+  copy: src=client-up.sh dest=/etc/openvpn/{{ vpn_name }}-up.sh mode=744
+  notify: restart openvpn
+
+- name: Puts client auth in place
+  template:
+    src: vpn-client.auth.j2
+    dest: /etc/openvpn/{{ vpn_name }}-client.auth
+  notify: restart openvpn
+
+- name: Make sure openvpn starts
+  service: name=openvpn state=running enabled=yes
