@@ -2,7 +2,7 @@
   apt: pkg=radvd state=installed
 
 - name: Puts the vpn conf in place
-  template: src=radvd.conf.j2 dest=/etc/radvd.conf
+  template: src=radvd.conf.j2 dest=/etc/radvd.conf owner=radvd mode=0444
   notify: restart radvd
 
 - name: enable ipv6 routing
