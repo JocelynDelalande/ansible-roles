@@ -1,0 +1,23 @@
+- name: Install required package
+  apt: pkg=samba state=installed
+
+- name: Put config file
+  template: src=smb.conf.j2 dest=/etc/samba/smb.conf
+  notify: Restart samba
+
+- name: Ensure authorized users exist
+  user: name="{{ item.login }}" group=nogroup createhome=no
+  with_items: cifs_server_users
+
+- name: Create the share directories if needed
+  file: name="{{ item.path }}" owner="{{ item.owner|default('nobody') }}" state=directory
+  with_items: cifs_server_shares
+
+- name: Create password for those samba users
+  shell: echo -ne {{ item.password }}\n{{ item.password }}\n | smbpasswd -s -a {{ item.login }}
+
+  with_items: cifs_server_users
+
+- name: Ensure Samba is running and set to start on boot.
+  service: name=samba state=started enabled=yes
+
