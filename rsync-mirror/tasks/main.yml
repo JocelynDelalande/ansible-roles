@@ -1,0 +1,49 @@
+- name: Install rsync
+  apt: pkg=rsync state=installed
+
+- name: Ensure user exist
+  user: name="{{ item.local_user }}" createhome=yes
+  with_items: rsync_mirror_mirrors
+
+
+- name: Make mirror dir
+  file:
+    name: "{{ item.local_path }}"
+    state: directory
+    group: "{{ item.local_user }}"
+    owner: "{{ item.local_user }}"
+    mode: 0755
+  with_items: rsync_mirror_mirrors
+
+- name: Make user ssh dir
+  file:
+    name: "~{{ item.local_user }}/.ssh/"
+    state: directory
+    group: "{{ item.local_user }}"
+    owner: "{{ item.local_user }}"
+    mode: 0700
+  with_items: rsync_mirror_mirrors
+
+- name: Copy private_key
+  copy:
+    content: "{{ item.key.pvkey | b64decode }}"
+    dest: "~{{ item.local_user }}/.ssh/{{ item.key.name }}"
+    group: "{{ item.local_user }}"
+    owner: "{{ item.local_user }}"
+    mode: 0700
+
+  with_items: rsync_mirror_mirrors
+
+- name: Find rsync server remote key
+  command: ssh-keyscan "{{ item.remote_host }}"
+  register: rsync_server_host_key
+  sudo_user: "{{ item.local_user }}"
+  with_items: rsync_mirror_mirrors
+
+- name: Adds server host key if not already present
+  lineinfile: create=yes dest="/etc/ssh/ssh_known_hosts" line="{{ item.stdout }}" state=present
+  with_items: rsync_server_host_key.results
+
+- name: Put mirroring script
+  template: src=rsync-mirror.j2 dest=/etc/cron.daily/rsync-mirror mode=0744
+

@@ -1,0 +1,7 @@
+#!/bin/sh
+# Managed by ansible
+
+{% for mirror in rsync_mirror_mirrors %}
+su {{ mirror.local_user }} -c 'rsync -az -e "ssh -i /home/{{ mirror.local_user }}/.ssh/{{ mirror.key.name }}" \
+   {{ mirror.remote_user }}@{{ mirror.remote_host }}:{{ mirror.remote_path }} {{ mirror.local_path }}'
+{% endfor %}
