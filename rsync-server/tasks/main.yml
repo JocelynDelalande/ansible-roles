@@ -1,0 +1,59 @@
+- name: Install rsync
+  apt: pkg=rsync state=installed
+
+- name: Install a recent version of btrfs-tools (from backports)
+  apt: pkg=btrfs-tools state=installed default_release=wheezy-backports
+
+- name: Put rrsync in-place
+  copy: src=rrsync dest=/usr/local/bin/rrsync mode=0555
+
+- name: Create base dir to store backups
+  file: name="{{ rsync_server_path }}" state=directory
+
+- name: Create dedicated btrfs main subvolumes
+  command: >
+    btrfs subvolume create {{ rsync_server_path }}/{{ item.name }}
+    creates={{ rsync_server_path }}/{{ item.name }}
+  with_items: rsync_server_backup_clients
+
+- name: Create incoming btrfs subvolumes
+  command: >
+    btrfs subvolume create {{ rsync_server_path }}/{{ item.name }}/incoming
+    creates={{ rsync_server_path }}/{{ item.name }}/incoming
+  with_items: rsync_server_backup_clients
+
+- name: Create main folder
+  file:
+    name: "{{ rsync_server_path }}/{{ item.name }}"
+    state: directory
+    group: "{{ rsync_server_user }}"
+    owner: root
+    mode: 0750
+  with_items: rsync_server_backup_clients
+
+- name: Create incoming r/w folder
+  file:
+    name: "{{ rsync_server_path }}/{{ item.name }}/incoming"
+    state: directory
+    owner: "{{ rsync_server_user }}"
+    mode: 0700
+  with_items: rsync_server_backup_clients
+
+- name: Create snapshots r-o folder
+  file:
+    name: "{{ rsync_server_path }}/{{ item.name }}/snapshots"
+    state: directory
+    owner: "root"
+    group: "{{ rsync_server_user }}"
+    mode: 0750
+  with_items: rsync_server_backup_clients
+
+- name: Create base dir to store backups
+  file: name="~{{ rsync_server_user }}/.ssh/" state=directory mode=0750 owner="{{ rsync_server_user }}" group="{{ rsync_server_user }}"
+
+- name: Register entries in authorized_keys
+  template:
+    src: authorized_keys.j2
+    dest: "~{{ rsync_server_user }}/.ssh/authorized_keys"
+    owner: "{{ rsync_server_user }}"
+    mode: 0700

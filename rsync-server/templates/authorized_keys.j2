@@ -1,0 +1,6 @@
+{% for client in rsync_server_backup_clients %}
+command="/usr/local/bin/rrsync {{ rsync_server_path }}/{{ client.name }}" {{ client.ssh_pubkey }}
+{% endfor %}
+{% for client in rsync_server_mirror_clients %}
+command="/usr/local/bin/rrsync {{ client.path }}" {{ client.ssh_pubkey }}
+{% endfor %}
