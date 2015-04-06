@@ -18,3 +18,6 @@
 - name: Ensures pulseaudio daemon is enabled
   service: name=pulseaudio enabled=yes
   notify: restart pulseaudio
+
+- name: Ensures avahi is enabled for service advertising
+  service: name=avahi-daemon enabled=yes state=started
