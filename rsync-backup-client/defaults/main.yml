@@ -1,0 +1,21 @@
+# Those file will not be copied on backup
+rsync_backup_client_exclude_list:
+  - "*/nobackup/*"
+  - "Cache/"
+  - "*~"
+  - ".Trash*"
+  - ".thumbnails/"
+
+# Must be readable
+rsync_backup_client_ssh_key: /root/.ssh/id_rsa
+
+# Where to store the backups on remote host
+# the default matches rsync-server role.
+rsync_backup_client_remote_path: incoming
+
+# Set it to yes to enable local LDAP dump and backup
+rsync_backup_client_ldap: no
+
+# Set it to yes to enable local MySQL dump and backup of all bases
+# Be sure to also set rsync_backup_client_mysql_root_pass_file
+rsync_backup_client_mysql: no

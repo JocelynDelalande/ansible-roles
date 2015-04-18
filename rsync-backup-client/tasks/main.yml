@@ -1,0 +1,32 @@
+- name: Install rsync
+  apt: pkg=rsync state=installed
+
+- name: Check that  ssh private key exists
+  file:
+    path: "{{ rsync_backup_client_ssh_key }}"
+    owner: root
+    group: root
+    state: file
+
+- name: Find rsync server remote key
+  command: ssh-keyscan "{{ rsync_backup_client_ssh_host }}"
+  register: rsync_server_host_key
+
+- name: Adds server host key if not already present
+  lineinfile:
+    create: yes
+    dest: "/etc/ssh/ssh_known_hosts"
+    line: "{{ rsync_server_host_key.stdout }}"
+    state: present
+
+- name: Create rsync-backup config dir
+  file: path=/etc/rsync-backup state=directory mode=0644
+
+- name: Puts ignore list
+  template: src=exclude-list.j2 dest=/etc/rsync-backup/exclude-list
+
+- name: Puts cron backup script
+  template:
+    src: rsync-backup.j2
+    dest: /etc/cron.daily/rsync-backup
+    mode: 0744

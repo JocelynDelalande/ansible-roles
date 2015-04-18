@@ -1,0 +1,49 @@
+#!/bin/sh
+set -e
+
+# backup-rsync [-v]
+
+SSH_USER={{ rsync_backup_client_ssh_user }}
+SSH_HOST={{ rsync_backup_client_ssh_host }}
+SSH_KEY={{ rsync_backup_client_ssh_key }}
+REMOTE_BACKUP_ROOT={{ rsync_backup_client_remote_path }}
+MYSQL_TMP_DUMP_FILE=/root/mysql_all_db.sql
+LDAP_TMP_DUMP_FILE=/root/ldap_all_db.ldif
+
+#PSQL_TMP_DUMP_FILE=/root/postgres_all_db.sql
+
+RSYNC="rsync -az -e \"ssh -i ${SSH_KEY}\"  --delete --delete-after --delete-excluded --exclude-from=/etc/rsync-backup/exclude-list"
+
+
+if [  "$1" = "-v" ]; then
+    RSYNC=${RSYNC}" -v --progress"
+fi
+
+{% for local_path in rsync_backup_client_dirs %}
+eval $RSYNC --relative {{ local_path }}/ ${SSH_USER}@${SSH_HOST}:${REMOTE_BACKUP_ROOT}/
+{% endfor %}
+
+# Backup databases
+#su postgres -c pg_dumpall > $PSQL_TMP_DUMP_FILE
+
+
+{% if rsync_backup_client_mysql %}
+MYSQL_ROOT_PASS_FILE={{ rsync_backup_client_mysql_root_pass_file }}
+mysqldump --all-databases --events -p`cat $MYSQL_ROOT_PASS_FILE`> $MYSQL_TMP_DUMP_FILE
+eval $RSYNC $MYSQL_TMP_DUMP_FILE ${SSH_USER}@${SSH_HOST}:${REMOTE_BACKUP_ROOT}/
+rm $MYSQL_TMP_DUMP_FILE
+
+{% endif %}
+
+{% if rsync_backup_client_ldap %}
+
+slapcat -l $LDAP_TMP_DUMP_FILE
+eval $RSYNC $LDAP_TMP_DUMP_FILE ${SSH_USER}@${SSH_HOST}:${REMOTE_BACKUP_ROOT}/
+rm $LDAP_TMP_DUMP_FILE
+
+{% endif %}
+
+#eval $RSYNC $PSQL_TMP_DUMP_FILE ${SSH_USER}@${SSH_HOST}:${REMOTE_BACKUP_ROOT}/
+#rm $PSQL_TMP_DUMP_FILE
+
+
