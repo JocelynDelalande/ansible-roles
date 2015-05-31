@@ -13,7 +13,8 @@ rsync+ssh server.
 Assumptions:
 
 - the user doing backup is root
-- it does have a passwordless ssh key in *~/.ssh/id_rsa*
+- you already have a passwordless ssh key on your host (default :
+  */root/.ssh/id_rsa*), **the role will not create it for you**.
 
 Minimal setup with ldap+mysql backup (will match *rsync-server role* defaults) :
 
