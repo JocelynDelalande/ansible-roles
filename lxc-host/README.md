@@ -64,7 +64,9 @@ To create a new container:
                --dist debian --release wheezy --arch amd64
 
 Then register it in `dmz_hosts` variable (in site.yml) registering propper
-distro/release and ip-addr and run the provision.
+distro/release and ip-addr and run the provision :
+
+    ansible-playbook --ask-vault-pass site.yml -tlxc
 
 You can now start it on lxc host (needed to pick up dns info):
 
@@ -76,12 +78,12 @@ And do basic provisionning on it :
     cp /root/.ssh/authorized_keys /var/lib/lxc/${myhostname}/rootfs/root/.ssh/
     echo 'nameserver 80.67.169.12' >> /var/lib/lxc/${myhostname}/rootfs/etc/resolv.conf
     chroot /var/lib/lxc/${myhostname}/rootfs apt-get update
-    chroot /var/lib/lxc/${myhostname}/rootfs apt-get install openssh-server python-minimal
+    chroot /var/lib/lxc/${myhostname}/rootfs apt-get install openssh-server python-minimal python-apt
     chroot /var/lib/lxc/${myhostname}/rootfs dpkg-reconfigure locales
 
 
 Restart it (so that ssh & co starts properly)
 
-    lxc-stop -n myhostname -r
+    lxc-stop -n ${myhostname} -r
 
 New host is now ready to be added to the inventory and ansibled!
