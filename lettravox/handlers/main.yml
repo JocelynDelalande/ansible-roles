@@ -1,0 +1,5 @@
+- name: restart lettravox
+  supervisorctl: name=lettravox state=restarted
+
+- name: restart supervisor
+  service: name=supervisor state=restarted

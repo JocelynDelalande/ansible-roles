@@ -1,0 +1,86 @@
+- name: install dependencies
+  apt: name={{ item }} force=yes state=installed
+  with_items:
+    - python
+    - python-virtualenv
+    - python-all-dev
+    - python-pip
+    - git
+    - libjpeg-dev
+    - libpng12-dev
+    - texlive-latex-extra
+    - texlive-lang-french
+    - texlive-humanities
+    - latex2html
+    - supervisor
+    - sudo
+
+- name: create LettraVox user
+  user: name={{ lettravox_user }} home={{ lettravox_home_dir }}
+
+- name: fetch application sources
+  sudo: yes
+  git:
+    repo: '{{ lettravox_git_repo_url }}'
+    dest: '{{ lettravox_install_dir }}'
+    accept_hostkey: yes
+    version: '{{ lettravox_version }}'
+  notify: restart lettravox
+
+- name: Attribute source to lettravox user
+  file:
+    path: '{{ lettravox_install_dir }}'
+    state: directory
+    owner: lettravox
+    group: lettravox
+    recurse: yes
+
+- name: create virtualenv
+  sudo: yes
+  sudo_user: '{{ lettravox_user }}'
+  shell: virtualenv {{ lettravox_venv_dir }} creates={{ lettravox_venv_dir }}
+
+- name: install pip requirements
+  sudo: yes
+  sudo_user: '{{ lettravox_user }}'
+  pip:
+    requirements: '{{ lettravox_install_dir }}/requirements.txt'
+    virtualenv: '{{ lettravox_venv_dir }}'
+
+- name: install gunicorn
+  sudo: yes
+  sudo_user: '{{ lettravox_user }}'
+  pip: name=gunicorn virtualenv={{ lettravox_venv_dir }}
+
+- name: set local_settings.py
+  template: src=local_settings.j2 dest={{ lettravox_install_dir }}/local_settings.py
+  notify: restart lettravox
+
+- name: migrate db
+  sudo: yes
+  sudo_user: '{{ lettravox_user }}'
+  shell: ./manage.py syncdb --noinput
+  args:
+    chdir: '{{ lettravox_install_dir }}'
+  environment:
+    PATH: '{{ lettravox_venv_bin_path }}:{{ ansible_env.PATH }}'
+    AUTHENTIC2_SETTINGS_FILE: '{{ lettravox_install_dir }}/local_settings.py'
+
+# - name: collect static files
+#   sudo: yes
+#   sudo_user: '{{ lettravox_user }}'
+#   shell: './manage.py collectstatic --noinput'
+#   args:
+#     chdir: '{{ lettravox_install_dir }}'
+#   environment:
+#     PATH: "{{ lettravox_venv_bin_path }}:{{ ansible_env.PATH }}"
+
+- name: install supervisor
+  apt: pkg=supervisor state=installed
+
+- name: set supervisord config
+  template: src=supervisor.j2 dest=/etc/supervisor/conf.d/lettravox.conf
+  notify: restart supervisor
+
+- name: ensure application is running
+  supervisorctl: name=lettravox state=started
