@@ -42,4 +42,4 @@ External roles
 
 I may use external 3rdparty roles, from [ansible galaxy](https://galaxy.ansible.com/), they are not versioned here, but rather listed in *galaxy-roles*. To download them, just run :
 
-    ansible-galaxy install -r ansible-roles
+    ansible-galaxy install -p . -r galaxy-roles
