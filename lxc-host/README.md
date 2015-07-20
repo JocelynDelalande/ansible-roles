@@ -60,7 +60,7 @@ To create a new container:
 
     myhostname=foo
 
-    lxc-create -n ${myhostname} -t download -- \
+    lxc-create -B best -n ${myhostname} -t download -- \
                --dist debian --release wheezy --arch amd64
 
 Then register it in `dmz_hosts` variable (in site.yml) registering propper
