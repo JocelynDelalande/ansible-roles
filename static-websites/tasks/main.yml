@@ -1,0 +1,17 @@
+- name: Installs rsync
+  apt: pkg=rsync
+
+- name: Creates user if not existent
+  user: name="{{ static_websites_user.login }}" shell=/bin/bash
+
+- name: Deploys ssh access
+  authorized_key:
+    user: "{{ static_websites_user.login }}"
+    key: "{{ static_websites_user.ssh_key }}"
+
+- name: Makes static website directories
+  file:
+    path: "{{ item }}"
+    state: directory
+    owner: "{{ static_websites_user.login }}"
+  with_items: "{{ static_websites_dirs }}"
