@@ -61,7 +61,7 @@ frontend http_proxy
         option http-pretend-keepalive
 
         {% for name in ipv4_proxies %}
-        acl is_{{ name }} hdr_end(host) -i {{ name }}
+        acl is_{{ name }} hdr_beg(host) -i {{ name }}
         use_backend http_{{ name }} if is_{{ name }}
         {% endfor %}
 
