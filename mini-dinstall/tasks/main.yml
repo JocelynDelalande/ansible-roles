@@ -1,0 +1,32 @@
+- name: Install mini-dinstall and dependencies
+  apt: pkg={{ item }}
+  with_items:
+    - dput
+    - mini-dinstall
+    - rsync
+
+- name: creates user if not existent
+  user: name="{{ mini_dinstall_user.login }}" shell=/bin/bash
+
+- name: Deploys ssh access
+  authorized_key:
+    user: "{{ mini_dinstall_user.login }}"
+    key: "{{ mini_dinstall_user.ssh_key }}"
+
+- name: Put mini-dinstall config file
+  template:
+    src: mini-dinstall.cf.j2
+    dest: "~{{ mini_dinstall_user.login }}/.mini-dinstall.conf"
+    owner: "{{ mini_dinstall_user.login }}"
+
+- name: Creates repository dir
+  file:
+    state: directory
+    owner: "{{ mini_dinstall_user.login }}"
+    path: "{{ mini_dinstall_dir }}"
+
+- name: Creates log file
+  file:
+    state: touch
+    owner: "{{ mini_dinstall_user.login }}"
+    path: /var/log/mini-dinstall.log
