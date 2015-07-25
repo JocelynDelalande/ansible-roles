@@ -11,7 +11,14 @@
 
 - name: Makes static website directories
   file:
-    path: "{{ item }}"
+    path: "{{ item.path }}"
+    state: directory
+    owner: "{{ static_websites_user.login }}"
+  with_items: "{{ static_websites_dirs }}"
+
+- name: Put static content
+  file:
+    path: "{{ item.path }}"
     state: directory
     owner: "{{ static_websites_user.login }}"
   with_items: "{{ static_websites_dirs }}"
