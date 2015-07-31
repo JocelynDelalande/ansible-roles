@@ -1,0 +1,44 @@
+- name: Install ansible dependencies
+  apt: pkg=python-pycurl
+
+- name: Add packages.crapouillou.net repository
+  apt_repository:
+    repo: "deb http://packages.crapouillou.net wheezy/"
+
+- name: Installs packages.crapouillou.net repository key
+  apt_key:
+    # ansible 1.5 does not support long fingerprints
+    id: 2F94B353
+    url: http://jocelyn.delalande.fr/0x2F94B353.asc
+    state: present
+  register: aptkey
+
+- name: apt-get update to take new key into account
+  apt: update_cache=yes
+  when: aptkey.changed
+
+- name: Installs isso and the folks
+  apt: pkg={{ item }}
+  with_items:
+    - isso
+    - gunicorn
+
+# - name: Enable isso daemon
+#   lineinfile:
+#     dest: /etc/default/isso
+#     regexp: ^START_DAEMON=
+#     line: START_DAEMON=yes
+#   notify: Restart isso
+
+# - name: Put isso config file
+#   template: src=isso.cfg.j2 dest=/etc/isso.d/available/isso.cfg
+
+- name: Put isso config file
+  template: src=isso.cfg.j2 dest=/etc/isso.conf
+
+# - name: Enable isso config file
+#   file:
+#     src: /etc/isso.d/available/isso.cfg
+#     dest: /etc/isso.d/enabled/isso.cfg
+#     state: link
+#   notify: Restart isso
