@@ -61,7 +61,7 @@ To create a new container:
     myhostname=foo
 
     lxc-create -B best -n ${myhostname} -t download -- \
-               --dist debian --release wheezy --arch amd64
+               --dist debian --release jessie --arch amd64
 
 Then register it in `dmz_hosts` variable (in site.yml) registering propper
 distro/release and ip-addr and run the provision :
