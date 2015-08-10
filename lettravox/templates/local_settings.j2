@@ -5,3 +5,9 @@ SECRET_KEY = '{{ lettravox_secret_key }}'
 SITE_ID = 1
 SITE_URL = '{{ lettravox_url }}'
 SITE_NAME = '{{ lettravox_site_name }}'
+
+EMAIL_HOST = '{{ lettravox_smtp_host }}'
+EMAIL_PORT = '587'
+EMAIL_HOST_USER = '{{ lettravox_stmp_login }}'
+EMAIL_HOST_PASSWORD = '{{ lettravox_smtp_password }}'
+EMAIL_USE_TLS = True
