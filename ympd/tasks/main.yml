@@ -1,3 +1,6 @@
+- name: Add ympd user
+  user: name={{ ympd_user }}
+
 - name: Install ympd build dependencies
   apt: pkg={{ item }} state=installed update_cache=yes cache_valid_time=3600
   with_items:
@@ -5,31 +8,36 @@
     - cmake
     - libmpdclient-dev
 
-- name: Clone and install ympd
+- name: Clone ympd
   git: repo="{{ ympd_git_repo }}" dest="{{ ympd_clone_dir }}"
+  register: code
 
 - name: Make build directory
   file:
     path: "{{ ympd_build_dir }}"
     state: directory
+  when: code.changed
 
 - name: Bootstrap cmake
   command: cmake ..  -DCMAKE_INSTALL_PREFIX:PATH=/usr/local/
   args:
     chdir: "{{ ympd_build_dir }}"
     creates: "{{ ympd_build_dir }}/ympd"
+  when: code.changed
 
 - name: make
   command: make
   args:
     chdir: "{{ ympd_build_dir }}"
     creates: "{{ ympd_build_dir }}/ympd"
+  when: code.changed
 
 - name: make install
   command: make install
   args:
     chdir: "{{ ympd_build_dir }}"
-    creates: /usr/local/bin/ympd
+  when: code.changed
+  notify: Restart ympd
 
 - name: Installs upstart script
   template: src=ympd.conf.upstart.j2 dest="/etc/init/ympd.conf"
@@ -37,6 +45,3 @@
 
 - name: Enable/start ympd
   service: name=ympd enabled=yes state=started
-
-- name: Add ympd user
-  user: name={{ ympd_user }}
