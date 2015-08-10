@@ -53,7 +53,11 @@
   pip: name=gunicorn virtualenv={{ lettravox_venv_dir }}
 
 - name: set local_settings.py
-  template: src=local_settings.j2 dest={{ lettravox_install_dir }}/local_settings.py
+  sudo_user: '{{ lettravox_user }}'
+  template:
+    src: local_settings.j2
+    dest: "{{ lettravox_install_dir }}/local_settings.py"
+    owner: '{{ lettravox_user }}'
   notify: restart lettravox
 
 - name: migrate db
@@ -64,7 +68,7 @@
     chdir: '{{ lettravox_install_dir }}'
   environment:
     PATH: '{{ lettravox_venv_bin_path }}:{{ ansible_env.PATH }}'
-    AUTHENTIC2_SETTINGS_FILE: '{{ lettravox_install_dir }}/local_settings.py'
+    DJANGO_SETTINGS_FILE: '{{ lettravox_install_dir }}/settings.py'
 
 # - name: collect static files
 #   sudo: yes
@@ -79,7 +83,7 @@
   apt: pkg=supervisor state=installed
 
 - name: set supervisord config
-  template: src=supervisor.j2 dest=/etc/supervisor/conf.d/lettravox.conf
+  template: src=supervisor.j2 dest=/etc/supervisor/conf.d/lettravox.conf mode=644
   notify: restart supervisor
 
 - name: ensure application is running
