@@ -2,7 +2,7 @@ lettravox_user: lettravox
 lettravox_group: lettravox
 lettravox_home_dir: /srv/lettravox
 
-lettravox_git_repo_url: git@code.crapouillou.net:lettravox.git
+lettravox_git_repo_url: git@code.crapouillou.net:jocelyn/lettravox.git
 lettravox_version: master
 lettravox_install_dir: '{{ lettravox_home_dir }}/app'
 lettravox_static_dir: '{{ lettravox_install_dir }}/static'
