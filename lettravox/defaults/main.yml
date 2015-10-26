@@ -11,3 +11,5 @@ lettravox_gunicorn_port: 8080
 
 lettravox_venv_dir: '{{ lettravox_home_dir }}/venv'
 lettravox_venv_bin_path: "{{ lettravox_venv_dir }}/bin"
+
+lettravox_admins: []
