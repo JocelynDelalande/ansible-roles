@@ -78,14 +78,22 @@
     state: absent
   notify: restart lettravox
 
-# - name: collect static files
-#   sudo: yes
-#   sudo_user: '{{ lettravox_user }}'
-#   shell: './manage.py collectstatic --noinput'
-#   args:
-#     chdir: '{{ lettravox_install_dir }}'
-#   environment:
-#     PATH: "{{ lettravox_venv_bin_path }}:{{ ansible_env.PATH }}"
+- name: create static dir
+  file:
+    path: '{{ lettravox_static_dir }}'
+    state: directory
+    owner: '{{ lettravox_user }}'
+    group: '{{ lettravox_user }}'
+    recurse: yes
+
+- name: collect static files
+  sudo: yes
+  sudo_user: '{{ lettravox_user }}'
+  shell: './manage.py collectstatic --noinput'
+  args:
+    chdir: '{{ lettravox_install_dir }}'
+  environment:
+    PATH: "{{ lettravox_venv_bin_path }}:{{ ansible_env.PATH }}"
 
 - name: install supervisor
   apt: pkg=supervisor state=installed
