@@ -12,3 +12,4 @@ EMAIL_HOST_USER = '{{ lettravox_stmp_login }}'
 EMAIL_HOST_PASSWORD = '{{ lettravox_smtp_password }}'
 EMAIL_USE_TLS = True
 ADMINS = [{% for i in lettravox_admins %}('{{ i.name }}', '{{ i.mail }}') {% endfor %}]
+ALLOWED_HOSTS = ['{{ lettravox_domain }}']

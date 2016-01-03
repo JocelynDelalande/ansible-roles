@@ -14,11 +14,11 @@
     path: "{{ item.path }}"
     state: directory
     owner: "{{ static_websites_user.login }}"
-  with_items: "{{ static_websites_dirs }}"
+  with_items: static_websites_dirs
 
 - name: Put static content
   file:
     path: "{{ item.path }}"
     state: directory
     owner: "{{ static_websites_user.login }}"
-  with_items: "{{ static_websites_dirs }}"
+  with_items:  static_websites_dirs

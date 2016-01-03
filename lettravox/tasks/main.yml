@@ -70,6 +70,14 @@
     PATH: '{{ lettravox_venv_bin_path }}:{{ ansible_env.PATH }}'
     DJANGO_SETTINGS_FILE: '{{ lettravox_install_dir }}/settings.py'
 
+- name: wipe old captcha app dir
+  sudo: yes
+  sudo_user: '{{ lettravox_user }}'
+  file:
+    path: '{{ lettravox_install_dir }}/captcha'
+    state: absent
+  notify: restart lettravox
+
 # - name: collect static files
 #   sudo: yes
 #   sudo_user: '{{ lettravox_user }}'
