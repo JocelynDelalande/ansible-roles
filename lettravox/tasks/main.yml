@@ -63,7 +63,7 @@
 - name: migrate db
   sudo: yes
   sudo_user: '{{ lettravox_user }}'
-  shell: ./manage.py syncdb --noinput
+  shell: ./manage.py migrate --noinput
   args:
     chdir: '{{ lettravox_install_dir }}'
   environment:
