@@ -1,0 +1,32 @@
+- name: Install dependencies
+  apt: name={{ item }}
+  with_items:
+    - lirc
+    - ir-keytable
+
+- name: Put LIRC hardware.conf
+  template: src=hardware.conf.j2 dest=/etc/lirc/hardware.conf
+  notify: Restart LIRC
+
+- name: Put LIRC lircd.conf
+  template: src=lircd.conf.j2 dest=/etc/lirc/lircd.conf
+  notify: Restart LIRC
+
+- name: Setup ir-keytable remotes mapping
+  template: src=rc_keymap.j2 dest=/etc/rc_keymaps/{{ item.name }}
+  with_items: lirc_remotes
+  notify: Reload ir-keytable remotes
+
+- name: Register ir-keytable remotes
+  lineinfile: line="* * {{ item.name }}" dest="/etc/rc_maps.cfg"
+  notify: Reload ir-keytable remotes
+  with_items: lirc_remotes
+
+- name: Install ir-keytable upstart script
+  copy:
+    src: upstart-ir-keytable.conf
+    dest: /etc/init/ir-keytable.conf
+    mode: 0544
+
+- name: Enable ir-keytable
+  service: name=ir-keytable state=started enabled=yes

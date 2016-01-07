@@ -1,0 +1,5 @@
+- name: Reload ir-keytable remotes
+  service: name=ir-keytable state=restarted
+
+- name: Restart LIRC
+  service: name=lirc state=restarted enabled=yes

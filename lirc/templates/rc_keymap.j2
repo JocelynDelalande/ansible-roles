@@ -1,0 +1,4 @@
+# table {{ item.name }}, type: {{ item.protocol }}
+{% for scancode, lirc_code in item.map %}
+{{ scancode }} {{ lirc_code }}
+{% endfor %}
