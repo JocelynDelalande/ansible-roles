@@ -71,6 +71,11 @@ lxc.mount.entry = /sys/kernel/security sys/kernel/security none bind,optional 0 
 lxc.mount.entry = /sys/fs/pstore sys/fs/pstore none bind,optional 0 0
 {% endif %}
 
+{% if 'lirc' in item.lxc.features|default([]) %}
+lxc.cgroup.devices.allow = c 248:* rwm # /dev/lirc*
+lxc.mount.entry = /dev/lirc0 dev/lirc0 none bind,optional,create=file
+{% endif %}
+
 {% if item.lxc.distro == 'debian' %}{% if item.lxc.version == 'jessie' %}
 lxc.autodev = 1
 lxc.kmsg = 0
