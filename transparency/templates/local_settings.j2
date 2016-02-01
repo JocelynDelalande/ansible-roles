@@ -1,0 +1,13 @@
+# -*- coding: utf-8 -*-
+# Django settings for project.
+
+SECRET_KEY = '{{ transparency_secret_key }}'
+SITE_ID = 1
+SITE_URL = '{{ transparency_url }}'
+SITE_NAME = '{{ transparency_site_name }}'
+
+ADMINS = [{% for i in transparency_admins %}('{{ i.name }}', '{{ i.mail }}') {% endfor %}]
+ALLOWED_HOSTS = ['{{ transparency_domain }}']
+
+# Where static files gets collected
+STATIC_ROOT = '{{ transparency_static_dir }}'

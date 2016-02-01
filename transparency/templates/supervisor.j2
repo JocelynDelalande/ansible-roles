@@ -1,0 +1,9 @@
+[program:transparency]
+environment=DJANGO_SETTINGS_MODULE='transparency.settings'
+directory={{ transparency_install_dir }}
+command={{ transparency_venv_bin_path }}/gunicorn -b 127.0.0.1:{{ transparency_gunicorn_port }} transparency.wsgi:application
+user={{ transparency_user }}
+autostart=true
+autorestart=true
+stdout_logfile=/var/log/supervisor/transparency.log
+redirect_stderr=true
