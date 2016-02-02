@@ -1,0 +1,104 @@
+# ansible generated torrc
+RunAsDaemon {{ tor_RunAsDaemon }}
+{% if ansible_os_family == 'FreeBSD' %}
+PidFile {{ tor_PidDir }}/{{ item[0] }}_{{ item.1.orport }}/pid
+{% endif %}
+{% if ansible_system == 'Linux' or tor_syslog == True %}
+Log {{ tor_LogLevel }} syslog
+{% else %}
+Log {{ tor_LogLevel }} file {{ tor_LogDir }}/{{ item[0] }}_{{ item.1.orport }}/log
+{% endif %}
+
+User _tor-{{ item[0] }}_{{ item.1.orport }}
+
+DataDirectory {{ tor_DataDir }}/{{ item[0] }}_{{ item.1.orport }}
+
+ORPort {{ item[0] }}:{{ item.1.orport }}
+{% if item.1.dirport != 0 %}
+DirPort {{ item[0] }}:{{ item.1.dirport }}
+{% endif %}
+Address {{ item[0] }}
+OutboundBindAddress {{ item[0] }}
+SocksPort {{ tor_SocksPort }}
+OfflineMasterKey 1
+{% if tor_enableControlSocket == True %}
+ControlSocket {{ tor_DataDir }}/{{ item[0] }}_{{ item.1.orport }}/controlsocket
+{% else %}
+ControlSocket 0
+CookieAuthentication 0
+{% endif %}
+
+{% if tor_ContactInfo is defined %}
+ContactInfo {{ tor_ContactInfo }}
+{% endif %}
+
+{% if tor_nickname is defined %}
+Nickname {{tor_nickname}}
+{% endif %}
+
+MyFamily {{ family.stdout }}
+
+
+{% if tor_ExitRelay == True %}
+# we are an exit relay!
+ExitRelay 1
+ExitPolicy {{ tor_ExitPolicy }}
+{% else %}
+ExitRelay 0
+ExitPolicy reject *:*
+{% endif %}
+
+ShutdownWaitLength {{ tor_shutdownwaitlength }}
+
+{% if tor_PublishServerDescriptor is defined %}
+PublishServerDescriptor {{ tor_PublishServerDescriptor }}
+{% endif %}
+{% if tor_HeartbeatPeriod is defined %}
+HeartbeatPeriod {{ tor_HeartbeatPeriod }}
+{% endif %}
+{% if tor_SafeLogging is defined %}
+SafeLogging {{ tor_SafeLogging }}
+{% endif %}
+{% if tor_MaxAdvertisedBandwidth is defined %}
+MaxAdvertisedBandwidth {{ tor_MaxAdvertisedBandwidth }}
+{% endif %}
+{% if tor_RelayBandwidthRate is defined %}
+RelayBandwidthRate {{ tor_RelayBandwidthRate }}
+{% endif %}
+{% if tor_RelayBandwidthBurst is defined %}
+RelayBandwidthBurst {{ tor_RelayBandwidthBurst }}
+{% endif %}
+{% if tor_CellStatistics is defined %}
+CellStatistics {{ tor_CellStatistics }}
+{% endif %}
+{% if tor_EntryStatistics is defined %}
+EntryStatistics {{ tor_EntryStatistics }}
+{% endif %}
+{% if tor_ExitPortStatistics is defined %}
+ExitPortStatistics {{ tor_ExitPortStatistics }}
+{% endif %}
+{% if tor_IPv6Exit is defined %}
+IPv6Exit {{ tor_IPv6Exit }}
+{% endif %}
+{% if tor_MaxOnionQueueDelay is defined %}
+MaxOnionQueueDelay {{ tor_MaxOnionQueueDelay }}
+{% endif %}
+{% if tor_NumCPUs is defined %}
+NumCPUs {{ tor_NumCPUs }}
+{% endif %}
+{% if tor_PortForwarding is defined %}
+PortForwarding {{ tor_PortForwarding }}
+{% endif %}
+{% if tor_AccountingMax is defined %}
+AccountingMax {{ tor_AccountingMax }}
+{% endif %}
+{% if tor_AccountingRule is defined %}
+AccountingRule {{ tor_AccountingRule }}
+{% endif %}
+{% if tor_AccountingStart is defined %}
+AccountingStart {{ tor_AccountingStart }}
+{% endif %}
+{% if tor_MaxMemInQueues is defined %}
+MaxMemInQueues {{ tor_MaxMemInQueues }}
+{% endif %}
+# end of torrc

@@ -1,0 +1,73 @@
+---
+
+- name: Setup FreeBSD specific variables (set_fact)
+  set_fact:
+    tor_DataDir: /var/db/tor
+    tor_ConfDir: /usr/local/etc/tor/enabled
+  tags:
+   - reconfigure
+   - renewkey
+   - createdir
+
+- name: Ensure Tor is installed (FreeBSD)
+  become: yes
+  pkgng: name=tor state=present
+
+# temporary solution until rc.d supports multiple instances
+- name: Ensure Tor starts at boot (FreeBSD)
+  become: yes
+  lineinfile: dest=/etc/rc.local line="/usr/local/bin/tor -f {{ tor_ConfDir }}/{{ item[0] }}_{{ item.1.orport }}.torrc" create=yes
+  with_nested:
+   - tor_ips
+   - tor_ports
+
+- name: If LogDir is a file, rename it (FreeBSD)
+  become: yes
+  shell: "test -f {{ tor_LogDir }} && mv {{ tor_LogDir }} {{ tor_LogDir }}.bk-`date '+%Y-%m-%d_%H%M%S'`"
+  ignore_errors: yes
+
+- name: Ensure sequential IP IDs are avoided (net.inet.ip.random_id)
+  become: yes
+  sysctl: name=net.inet.ip.random_id value=1 reload=no sysctl_set=yes
+  tags:
+    - freebsdkern
+
+- name: Gather current kern.ipc.somaxconn setting (FreeBSD)
+  shell: "sysctl kern.ipc.somaxconn|cut -d' '  -f2"
+  register: currentsomaxconn
+  tags:
+   - freebsdkern
+
+- name: Ensure somaxconn setting is reasonable (FreeBSD)
+  become: yes
+  command: "sysctl kern.ipc.somaxconn={{ freebsd_somaxconn }}"
+  when: currentsomaxconn.stdout|int < {{ freebsd_somaxconn }}
+  tags:
+   - freebsdkern
+
+- name: Ensure somaxconn setting in sysctl.conf is reasonable (FreeBSD)
+  become: yes
+  lineinfile: dest=/etc/sysctl.conf regexp=^kern.ipc.somaxconn line="kern.ipc.somaxconn={{ freebsd_somaxconn }}" create=yes
+  when: currentsomaxconn.stdout|int < {{ freebsd_somaxconn }}
+  tags:
+   - freebsdkern
+
+- name: Gather current kern.ipc.nmbclusters setting (FreeBSD)
+  shell: "sysctl kern.ipc.nmbclusters|cut -d' '  -f2"
+  register: currentnmbc
+  tags:
+   - freebsdkern
+
+- name: Ensure nmbclusters setting is reasonable (FreeBSD)
+  become: yes
+  command: "sysctl kern.ipc.nmbclusters={{ freebsd_nmbclusters }}"
+  when: currentnmbc.stdout|int < {{ freebsd_nmbclusters }}
+  tags:
+   - freebsdkern
+
+- name: Ensure nmbclusters setting in sysctl.conf is reasonable (FreeBSD)
+  become: yes
+  lineinfile: dest=/etc/sysctl.conf regexp=^kern.ipc.nmbclusters line="kern.ipc.nmbclusters={{ freebsd_nmbclusters }}" create=yes
+  when: currentnmbc.stdout|int < {{ freebsd_nmbclusters }}
+  tags:
+   - freebsdkern

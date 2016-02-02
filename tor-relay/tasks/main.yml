@@ -1,0 +1,51 @@
+---
+
+- include: apt_install.yml
+  when: ansible_pkg_mgr == 'apt'
+  tags:
+   - debian
+   - install
+
+- include: rpm_install.yml
+  when: ansible_pkg_mgr == 'yum' or ansible_pkg_mgr == 'dnf'
+  tags:
+   - centos
+   - fedora
+   - install
+
+- include: openbsd_install.yml
+  when: ansible_pkg_mgr == 'openbsd_pkg'
+  tags:
+   - openbsd
+   - install
+
+- include: freebsd_install.yml
+  when: ansible_pkg_mgr == 'pkgng'
+  tags:
+   - freebsd
+   - install
+
+- include: configure.yml
+  tags:
+   - debian
+   - centos
+   - fedora
+   - openbsd
+   - freebsd
+
+- include: linux_service.yml
+  when: ansible_system == 'Linux'
+  tags:
+   - debian
+   - centos
+   - fedora
+
+- include: openbsd_service.yml
+  when: ansible_system == 'OpenBSD'
+  tags:
+   - openbsd
+
+- include: freebsd_service.yml
+  when: ansible_system == 'FreeBSD'
+  tags:
+   - freebsd

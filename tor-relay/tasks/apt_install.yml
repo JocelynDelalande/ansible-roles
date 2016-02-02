@@ -1,0 +1,50 @@
+---
+
+- name: Setup Debian specific variables (set_fact)
+  set_fact:
+    tor_user: debian-tor
+    tor_DataDir: /var/lib/tor-instances
+    tor_ConfDir: /etc/tor/instances
+    tor_RunAsDaemon: 0
+  tags:
+   - reconfigure
+   - renewkey
+   - createdir
+
+- name: Ensure torproject gpg key is installed (A3C4F0F979CAA22CDBA8F512EE8CBC9E886DDD89)
+  become: yes
+  apt_key: data="{{ lookup('file', 'deb.torproject.org_A3C4F0F979CAA22CDBA8F512EE8CBC9E886DDD89.pub') }}"
+    id=A3C4F0F979CAA22CDBA8F512EE8CBC9E886DDD89
+    state=present
+
+- name: Ensure torproject.org repository is present (APT)
+  become: yes
+  apt_repository: repo='deb http://deb.torproject.org/torproject.org {{ tor_distribution_release }} main'
+    state=present 
+    update_cache=yes
+
+# we specifically opt for present over latest to improve performance
+# "latest" is covered by auto updates
+- name: Ensure Tor is installed (APT)
+  become: yes
+  apt: pkg="{{ item }}" state=present
+  with_items: 
+    - deb.torproject.org-keyring
+    - tor
+  # apt starts a tor client instance by default after installing the package
+  # we do not need that
+  notify:
+    - stop-and-disable default tor
+
+
+- name: Ensure AppArmor allows access to necessary files (Ubuntu)
+  become: yes
+  lineinfile: dest=/etc/apparmor.d/local/system_tor line={{ item }}
+  with_items:
+    - '/etc/tor/enabled/*\ r,'
+    - '/{,var/}run/tor/*.pid\ w,'
+    - '/var/lib/tor/**\ w,'
+  when: ansible_distribution == 'Ubuntu'
+  notify: restart apparmor
+
+- meta: flush_handlers
