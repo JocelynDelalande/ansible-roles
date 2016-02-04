@@ -95,6 +95,25 @@
   environment:
     PATH: "{{ lettravox_venv_bin_path }}:{{ ansible_env.PATH }}"
 
+- name: give read rights on static files to the httpd
+  sudo: yes
+  sudo_user: '{{ lettravox_user }}'
+  command: "setfacl -R -m u:{{ lettravox_httpd_user }}:rx {{ item }}"
+
+  with_items:
+    - "{{ lettravox_media_dir }}"
+    - "{{ lettravox_static_dir }}"
+
+- name: give read rights on static files to the httpd (default rule)
+  sudo: yes
+  sudo_user: '{{ lettravox_user }}'
+  command: "setfacl -R -m d:u:{{ lettravox_httpd_user }}:rx {{ item }}"
+
+  with_items:
+    - "{{ lettravox_media_dir }}"
+    - "{{ lettravox_static_dir }}"
+
+
 - name: install supervisor
   apt: pkg=supervisor state=installed
 
