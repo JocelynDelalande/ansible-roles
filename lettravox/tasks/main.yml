@@ -8,6 +8,7 @@
     - git
     - libjpeg-dev
     - libpng12-dev
+    - libfreetype6-dev
     - texlive-latex-extra
     - texlive-lang-french
     - texlive-humanities
