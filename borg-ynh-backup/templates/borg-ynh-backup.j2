@@ -1,0 +1,47 @@
+#!/bin/sh
+
+## Use Yunohost backup mechanism to build a backup and push it via borg to a
+## remote repository, encrypted.
+## Repository is auto-created if missing
+
+set -e
+
+TMP_PATH=/home/yunohost.backup/borg-tmp/
+REPOSITORY={{ borg_ynh_backup_repository }}
+export BORG_RSH="ssh -i {{ borg_ynh_backup_ssh_key }}"
+export BORG_PASSPHRASE="notsosecret"
+
+trap cleanup 1 2 3 6
+
+cleanup_ynh_backup()
+{
+   # that's a hack, waiting for "yunohost backup delete" to allow arbitrary backups
+   umount ${TMP_PATH}/data/*/* || /bin/true
+   umount ${TMP_PATH}/data/*   || /bin/true
+   rm -rf ${TMP_PATH}
+}
+
+cleanup()
+{
+    cleanup_ynh_backup
+    exit $1
+}
+
+cleanup_ynh_backup
+yunohost backup create -r --ignore-apps -o ${TMP_PATH}
+
+# Init repository key, if not already present
+borg list ${REPOSITORY} || borg init --encryption=keyfile ${REPOSITORY}
+
+# Back it up !
+borg create -v --stats ${REPOSITORY}::`date +%Y-%m-%d` ${TMP_PATH} \
+    > /var/log/borg-ynh-backup.log
+
+# Clean old backups
+borg prune -v $REPOSITORY \
+    --keep-daily={{ borg_ynh_backup_daily }} \
+    --keep-weekly={{ borg_ynh_backup_weekly }} \
+    --keep-monthly={{ borg_ynh_backup_monthly }}
+
+cleanup_ynh_backup
+exit 0
