@@ -1,0 +1,3 @@
+{% for client in borg_server_backup_clients %}
+command="borg serve --restrict-to-path {{ borg_server_repositories }}/{{ client.name }}" {{ client.ssh_pubkey }}
+{% endfor %}

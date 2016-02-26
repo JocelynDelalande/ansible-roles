@@ -1,0 +1,2 @@
+borg_server_home: /var/borg-backups
+borg_server_repositories: "{{ borg_server_home }}/repos"

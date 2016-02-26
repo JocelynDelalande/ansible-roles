@@ -1,0 +1,27 @@
+- name: Create dedicated user
+  user: name={{ borg_server_user }} home={{ borg_server_home }}
+
+- name: Check that borg is installed (see borg-common role)
+  file: path=/usr/local/bin/borg state=file follow=yes
+
+- name: Create base dir to store backups
+  file: name="{{ borg_server_repositories }}" state=directory
+
+- name: Create client folders
+  file:
+    name: "{{ borg_server_repositories }}/{{ item.name }}"
+    state: directory
+    group: "{{ borg_server_user }}"
+    owner: "{{ borg_server_user }}"
+    mode: 0750
+  with_items: borg_server_backup_clients
+
+- name: Create ssh dir
+  file: name="~{{ borg_server_user }}/.ssh/" state=directory mode=0750 owner="{{ borg_server_user }}" group="{{ borg_server_user }}"
+
+- name: Register entries in authorized_keys
+  template:
+    src: authorized_keys.j2
+    dest: "{{ borg_server_home }}/.ssh/authorized_keys"
+    owner: "{{ borg_server_user }}"
+    mode: 0700
