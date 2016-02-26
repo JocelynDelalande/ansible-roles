@@ -78,7 +78,7 @@ And do basic provisionning on it :
     cp /root/.ssh/authorized_keys /var/lib/lxc/${myhostname}/rootfs/root/.ssh/
     echo 'nameserver 80.67.169.12' >> /var/lib/lxc/${myhostname}/rootfs/etc/resolv.conf
     chroot /var/lib/lxc/${myhostname}/rootfs apt-get update
-    chroot /var/lib/lxc/${myhostname}/rootfs apt-get install openssh-server python-minimal python-apt
+    chroot /var/lib/lxc/${myhostname}/rootfs apt-get install --yes openssh-server python-minimal python-apt
     chroot /var/lib/lxc/${myhostname}/rootfs dpkg-reconfigure locales
 
 
