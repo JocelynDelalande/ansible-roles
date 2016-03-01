@@ -41,7 +41,7 @@ cleanup_ynh_backup
 
 ts_log "Performing yunohost backup."
 yunohost backup create -r --ignore-apps -o ${TMP_PATH} \
-    >> $LOG_PATH} 2>&1
+    >> ${LOG_PATH} 2>&1
 
 ts_log "Initializing repository, if needed."
 borg list ${REPOSITORY} >/dev/null 2>&1 || \
