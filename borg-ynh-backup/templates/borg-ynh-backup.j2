@@ -40,7 +40,7 @@ ts_log "Cleaning up."
 cleanup_ynh_backup
 
 ts_log "Performing yunohost backup."
-yunohost backup create -r --ignore-apps -o ${TMP_PATH} \
+yunohost backup create --no-compress --ignore-apps -o ${TMP_PATH} \
     >> ${LOG_PATH} 2>&1
 
 ts_log "Initializing repository, if needed."
