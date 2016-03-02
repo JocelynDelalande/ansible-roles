@@ -29,6 +29,6 @@ If you set up both borg client and server, the easiest way is :
 TODO
 ----
 
-- Better stdout/stderr handling in script (a lot of things should go to /dev/null or in a log)
+- Use compression
 - Do not do everything as root
 - handle properly the passphrase
