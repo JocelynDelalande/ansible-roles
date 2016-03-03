@@ -30,5 +30,4 @@ TODO
 ----
 
 - Use compression
-- Do not do everything as root
 - handle properly the passphrase

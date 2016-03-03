@@ -37,5 +37,13 @@
     dest: /etc/sudoers.d/50-borg-ynh-backup
     validate: visudo -cf %s
 
-- name: Setup cron task
-  template: src=borg-ynh-backup.j2 dest=/etc/cron.d/borg-ynh-backup mode=0744
+- name: Send cron emails to root
+  cronvar: user="{{ borg_ynh_backup_user }}" name=MAILTO value=root
+
+- name: Setup cron task at 4:44
+  cron:
+    name: "borg-ynh-backup"
+    job: "{{ borg_ynh_backup_backup_script }}"
+    hour: 4
+    minute: 44
+    user: "{{ borg_ynh_backup_user }}"
