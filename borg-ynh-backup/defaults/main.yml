@@ -1,1 +1,11 @@
-borg_ynh_backup_ssh_key: /root/.ssh/id_rsa_borg
+borg_ynh_backup_user: borg
+borg_ynh_backup_home: "/home/{{ borg_ynh_backup_user }}"
+borg_ynh_backup_ssh_key: "{{ borg_ynh_backup_home }}/.ssh/id_rsa"
+borg_ynh_backup_log_path: /var/log/borg-ynh-backup.log
+borg_ynh_backup_tmp_path: /home/yunohost.backup/borg-tmp/
+
+borg_ynh_backup_bin_path: "{{ borg_ynh_backup_home }}/bin"
+borg_ynh_backup_sudoed_create: "{{ borg_ynh_backup_bin_path }}/ynh-backup-create"
+borg_ynh_backup_sudoed_push: "{{ borg_ynh_backup_bin_path }}/borg-backup-push"
+borg_ynh_backup_sudoed_cleanup: "{{ borg_ynh_backup_bin_path }}/ynh-backup-cleanup"
+borg_ynh_backup_backup_script: "{{ borg_ynh_backup_bin_path }}/borg-ynh-backup"

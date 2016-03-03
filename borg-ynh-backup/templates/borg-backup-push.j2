@@ -1,0 +1,13 @@
+#!/bin/sh
+# This script is meant to be executed via sudo, as root.
+# It must explicitly be authorized in a sudoers file
+
+TMP_PATH={{ borg_ynh_backup_tmp_path }}
+REPOSITORY={{ borg_ynh_backup_repository }}
+ARCHIVE_NAME=$1
+ARCHIVE="${REPOSITORY}::${ARCHIVE_NAME}"
+
+export BORG_RSH="ssh -i {{ borg_ynh_backup_ssh_key }}"
+export BORG_PASSPHRASE="notsosecret"
+
+borg create -v --stats "${ARCHIVE}" ${TMP_PATH}

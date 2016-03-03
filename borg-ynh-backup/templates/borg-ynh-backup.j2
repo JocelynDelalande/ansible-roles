@@ -9,25 +9,22 @@ set -e
 TMP_PATH=/home/yunohost.backup/borg-tmp/
 LOG_PATH=/var/log/borg-ynh-backup.log
 REPOSITORY={{ borg_ynh_backup_repository }}
-ARCHIVE=${REPOSITORY}::`date +%Y-%m-%d`
+BACKUP_DATE=`date +%Y-%m-%d`
+ARCHIVE=${REPOSITORY}::$BACKUP_DATE
 export BORG_RSH="ssh -i {{ borg_ynh_backup_ssh_key }}"
 export BORG_PASSPHRASE="notsosecret"
+
+YNH_BACKUP_CREATE={{ borg_ynh_backup_sudoed_create }}
+BORG_BACKUP_PUSH={{ borg_ynh_backup_sudoed_push }}
+YNH_BACKUP_CLEANUP={{ borg_ynh_backup_sudoed_cleanup }}
 
 # Trap on non-zero exit
 trap '[ "$?" -eq 0 ] || cleanup' EXIT
 
-cleanup_ynh_backup()
-{
-   # that's a hack, waiting for "yunohost backup delete" to allow arbitrary backups
-   umount ${TMP_PATH}/data/*/* >/dev/null 2>&1 || /bin/true
-   umount ${TMP_PATH}/data/* >/dev/null 2>&1 || /bin/true
-   rm -rf ${TMP_PATH}
-}
-
 cleanup()
 {
     echo "Something bad happened during backup, check ${LOG_PATH}"
-    cleanup_ynh_backup
+    sudo $YNH_BACKUP_CLEANUP
     exit $1
 }
 
@@ -37,19 +34,17 @@ ts_log()
 }
 
 ts_log "Cleaning up."
-cleanup_ynh_backup
+sudo $YNH_BACKUP_CLEANUP
 
 ts_log "Performing yunohost backup."
-yunohost backup create --no-compress --ignore-apps -o ${TMP_PATH} \
-    >> ${LOG_PATH} 2>&1
+sudo $YNH_BACKUP_CREATE $BACKUP_DATE  >> ${LOG_PATH} 2>&1
 
 ts_log "Initializing repository, if needed."
 borg list ${REPOSITORY} >/dev/null 2>&1 || \
   borg init --encryption=keyfile ${REPOSITORY} >> ${LOG_PATH} 2>&1
 
 ts_log "Creating archive ${ARCHIVE}."
-borg create -v --stats ${ARCHIVE} ${TMP_PATH} \
-    >> ${LOG_PATH} 2>&1
+sudo $BORG_BACKUP_PUSH $BACKUP_DATE >> ${LOG_PATH} 2>&1
 
 ts_log "Rotating old backups."
 borg prune -v $REPOSITORY \
@@ -59,5 +54,5 @@ borg prune -v $REPOSITORY \
     >> ${LOG_PATH} 2>&1
 
 ts_log "Cleaning up."
-cleanup_ynh_backup
+sudo $YNH_BACKUP_CLEANUP
 exit 0

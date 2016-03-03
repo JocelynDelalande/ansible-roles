@@ -1,12 +1,28 @@
 - name: Check that borg is installed (see borg-common role)
   file: path=/usr/local/bin/borg state=file follow=yes
 
-- name: Create dedicated ssh key
+- name: Create dedicated user
   user:
-    name: root
+    name: "{{ borg_ynh_backup_user }}"
+    home: "{{ borg_ynh_backup_home }}"
     generate_ssh_key: yes
     ssh_key_file: "{{ borg_ynh_backup_ssh_key }}"
-    ssh_key_comment: "borg backup root@{{ ansible_hostname }}"
+    ssh_key_comment: "borg backup {{ borg_ynh_backup_user }}@{{ ansible_hostname }}"
+
+- name: Create scripts directory
+  file: path={{ borg_ynh_backup_bin_path }} mode=0644 owner=root group=root state=directory
+
+- name: Put scripts in place
+  template: src={{ item.src }} dest={{ item.dest }} mode=0755 owner=root group=root
+  with_items:
+    - src: ynh-backup-create.j2
+      dest: "{{ borg_ynh_backup_sudoed_create }}"
+    - src: borg-backup-push.j2
+      dest: "{{ borg_ynh_backup_sudoed_push }}"
+    - src: ynh-backup-cleanup.j2
+      dest: "{{ borg_ynh_backup_sudoed_cleanup }}"
+    - src: borg-ynh-backup.j2
+      dest: "{{ borg_ynh_backup_backup_script }}"
 
 - name: Setup cron task
   template: src=borg-ynh-backup.j2 dest=/etc/cron.d/borg-ynh-backup mode=0744
