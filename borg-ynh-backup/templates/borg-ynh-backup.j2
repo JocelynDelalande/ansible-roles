@@ -19,6 +19,7 @@ export BORG_CACHE_DIR="{{ borg_ynh_backup_home }}/.borg/cache"
 YNH_BACKUP_CREATE={{ borg_ynh_backup_sudoed_create }}
 BORG_BACKUP_PUSH={{ borg_ynh_backup_sudoed_push }}
 YNH_BACKUP_CLEANUP={{ borg_ynh_backup_sudoed_cleanup }}
+BORG={{ borg_ynh_backup_borg_path }}
 
 # Trap on non-zero exit
 trap '[ "$?" -eq 0 ] || cleanup' EXIT
@@ -42,14 +43,14 @@ ts_log "Performing yunohost backup."
 sudo -n $YNH_BACKUP_CREATE $BACKUP_DATE  >> ${LOG_PATH} 2>&1
 
 ts_log "Initializing repository, if needed."
-borg list ${REPOSITORY} >/dev/null 2>&1 || \
-  borg init --encryption=keyfile ${REPOSITORY} >> ${LOG_PATH} 2>&1
+$BORG list ${REPOSITORY} >/dev/null 2>&1 || \
+  $BORG init --encryption=keyfile ${REPOSITORY} >> ${LOG_PATH} 2>&1
 
 ts_log "Creating archive ${ARCHIVE}."
 sudo -n $BORG_BACKUP_PUSH $BACKUP_DATE >> ${LOG_PATH} 2>&1
 
 ts_log "Rotating old backups."
-borg prune -v $REPOSITORY \
+$BORG prune -v $REPOSITORY \
     --keep-daily={{ borg_ynh_backup_daily }} \
     --keep-weekly={{ borg_ynh_backup_weekly }} \
     --keep-monthly={{ borg_ynh_backup_monthly }} \

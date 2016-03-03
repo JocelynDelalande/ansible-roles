@@ -1,5 +1,5 @@
 - name: Check that borg is installed (see borg-common role)
-  file: path=/usr/local/bin/borg state=file follow=yes
+  file: path={{ borg_ynh_borg_path }} state=file follow=yes
 
 - name: Create dedicated user
   user:

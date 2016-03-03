@@ -13,7 +13,7 @@ export BORG_PASSPHRASE="notsosecret"
 export BORG_KEYS_DIR="{{ borg_ynh_backup_home }}/.borg/keys"
 export BORG_CACHE_DIR="{{ borg_ynh_backup_home }}/.borg/cache"
 
-borg create -v --stats "${ARCHIVE}" ${TMP_PATH}
+{{ borg_ynh_backup_borg_path }} create -v --stats "${ARCHIVE}" ${TMP_PATH}
 
 # Give back the backup cache to the dedicated user
 chown -R {{ borg_ynh_backup_user }}:{{ borg_ynh_backup_user }} \
