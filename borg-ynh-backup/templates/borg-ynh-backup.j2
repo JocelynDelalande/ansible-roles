@@ -13,6 +13,8 @@ BACKUP_DATE=`date +%Y-%m-%d`
 ARCHIVE=${REPOSITORY}::$BACKUP_DATE
 export BORG_RSH="ssh -i {{ borg_ynh_backup_ssh_key }}"
 export BORG_PASSPHRASE="notsosecret"
+export BORG_KEYS_DIR="{{ borg_ynh_backup_home }}/.borg/keys"
+export BORG_CACHE_DIR="{{ borg_ynh_backup_home }}/.borg/cache"
 
 YNH_BACKUP_CREATE={{ borg_ynh_backup_sudoed_create }}
 BORG_BACKUP_PUSH={{ borg_ynh_backup_sudoed_push }}
@@ -24,7 +26,7 @@ trap '[ "$?" -eq 0 ] || cleanup' EXIT
 cleanup()
 {
     echo "Something bad happened during backup, check ${LOG_PATH}"
-    sudo $YNH_BACKUP_CLEANUP
+    sudo -n $YNH_BACKUP_CLEANUP
     exit $1
 }
 
@@ -34,17 +36,17 @@ ts_log()
 }
 
 ts_log "Cleaning up."
-sudo $YNH_BACKUP_CLEANUP
+sudo -n $YNH_BACKUP_CLEANUP
 
 ts_log "Performing yunohost backup."
-sudo $YNH_BACKUP_CREATE $BACKUP_DATE  >> ${LOG_PATH} 2>&1
+sudo -n $YNH_BACKUP_CREATE $BACKUP_DATE  >> ${LOG_PATH} 2>&1
 
 ts_log "Initializing repository, if needed."
 borg list ${REPOSITORY} >/dev/null 2>&1 || \
   borg init --encryption=keyfile ${REPOSITORY} >> ${LOG_PATH} 2>&1
 
 ts_log "Creating archive ${ARCHIVE}."
-sudo $BORG_BACKUP_PUSH $BACKUP_DATE >> ${LOG_PATH} 2>&1
+sudo -n $BORG_BACKUP_PUSH $BACKUP_DATE >> ${LOG_PATH} 2>&1
 
 ts_log "Rotating old backups."
 borg prune -v $REPOSITORY \
@@ -54,5 +56,5 @@ borg prune -v $REPOSITORY \
     >> ${LOG_PATH} 2>&1
 
 ts_log "Cleaning up."
-sudo $YNH_BACKUP_CLEANUP
+sudo -n $YNH_BACKUP_CLEANUP
 exit 0

@@ -10,7 +10,14 @@
     ssh_key_comment: "borg backup {{ borg_ynh_backup_user }}@{{ ansible_hostname }}"
 
 - name: Create scripts directory
-  file: path={{ borg_ynh_backup_bin_path }} mode=0644 owner=root group=root state=directory
+  file: path={{ borg_ynh_backup_bin_path }} mode=0655 owner=root group=root state=directory
+
+- name: Give rights on the log file
+  file:
+    path: "{{ borg_ynh_backup_log_path }}"
+    state: touch
+    owner: "{{ borg_ynh_backup_user }}"
+    group: "{{ borg_ynh_backup_user }}"
 
 - name: Put scripts in place
   template: src={{ item.src }} dest={{ item.dest }} mode=0755 owner=root group=root
@@ -23,6 +30,12 @@
       dest: "{{ borg_ynh_backup_sudoed_cleanup }}"
     - src: borg-ynh-backup.j2
       dest: "{{ borg_ynh_backup_backup_script }}"
+
+- name: Setup sudoers
+  template:
+    src: sudoers.j2
+    dest: /etc/sudoers.d/50-borg-ynh-backup
+    validate: visudo -cf %s
 
 - name: Setup cron task
   template: src=borg-ynh-backup.j2 dest=/etc/cron.d/borg-ynh-backup mode=0744

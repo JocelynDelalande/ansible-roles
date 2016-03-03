@@ -1,8 +1,9 @@
 #!/bin/sh
 # This script is meant to be executed via sudo, as root.
 # It must explicitly be authorized in a sudoers file
+set -e
 
 TMP_PATH={{ borg_ynh_backup_tmp_path }}
-sudo umount ${TMP_PATH}/data/*/* >/dev/null 2>&1 || /bin/true
-sudo umount ${TMP_PATH}/data/* >/dev/null 2>&1 || /bin/true
-sudo rm -rf ${TMP_PATH}
+umount ${TMP_PATH}/data/*/* >/dev/null 2>&1 || /bin/true
+umount ${TMP_PATH}/data/* >/dev/null 2>&1 || /bin/true
+rm -rf ${TMP_PATH}
