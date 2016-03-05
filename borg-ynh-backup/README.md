@@ -1,6 +1,9 @@
 Yunohost borg backup
 ====================
 
+Usage
+------
+
 *requires: borg-common*
 *see also: borg-server*
 
@@ -12,8 +15,11 @@ Backup Yunohost, via borg, to a remote repository over SSH.
       - borg_ynh_backup_weekly: 4
       - borg_ynh_backup_daily: 7
 
+
+### Passphrase
+
 You can either :
-- Choose your own passphrase and set it via `borg_ynh_backup_passphrase_path` var
+- Choose your own passphrase and set it via `borg_ynh_backup_passphrase` var
 - Let the playbook generate a strong one for you (be sure to back it up then)
 
 Set up client & server
