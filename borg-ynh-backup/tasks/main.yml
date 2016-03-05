@@ -1,5 +1,8 @@
 - name: Check that borg is installed (see borg-common role)
-  file: path={{ borg_ynh_borg_path }} state=file follow=yes
+  file: path={{ borg_ynh_backup_borg_path }} state=file follow=yes
+
+- include: passphrase.yml
+  tags: [borg.passphrase]
 
 - name: Create dedicated user
   user:

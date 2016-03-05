@@ -12,6 +12,10 @@ Backup Yunohost, via borg, to a remote repository over SSH.
       - borg_ynh_backup_weekly: 4
       - borg_ynh_backup_daily: 7
 
+You can either :
+- Choose your own passphrase and set it via `borg_ynh_backup_passphrase_path` var
+- Let the playbook generate a strong one for you (be sure to back it up then)
+
 Set up client & server
 ----------------------
 
@@ -22,12 +26,13 @@ If you set up both borg client and server, the easiest way is :
 - setup the server, configuring the given public_key
 - perform a test run by hand running `/etc/cron.d/borg-ynh-backup` if nothing
   appears, then it worked :-)
-- **backup your client private keys** (ssh & repo encryption), by hand, somewhere offline :
-  - /root/.borg/
-  - /root/.ssh/id_rsa_borg
+- **backup your client private keys** (ssh, repo key and repo key passphrase),
+  by hand, somewhere offline :
+  - *~borg/.borg/pass* folder
+  - *~borg/.ssh/id_rsa* file
 
 TODO
 ----
 
 - Use compression
-- handle properly the passphrase
+- switch to repokey security

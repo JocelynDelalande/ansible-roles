@@ -1,0 +1,32 @@
+# The passphrase is stored on borg client
+# It is either defined in vars or generated randomly.
+
+- name: Ensure borg passphrase dir exists
+  file:
+    path: "{{ borg_ynh_backup_passphrase_path|dirname }}"
+    mode: 0700
+    owner: "{{ borg_ynh_backup_user }}"
+    state: directory
+    recurse: yes
+
+- name: Checks if a passphrase is already stored
+  stat: path={{ borg_ynh_backup_passphrase_path }}
+  register: passphrase_file
+
+- name: Generate a random passphrase (if none provided)
+  when: borg_ynh_backup_passphrase is undefined and passphrase_file.stat.islnk is undefined
+  command: openssl rand -base64 200
+  register: generated_passphrase
+
+- name: Record generated passphrase
+  set_fact: borg_ynh_backup_passphrase={{ generated_passphrase.stdout }}
+  when: generated_passphrase.changed
+
+- name: Store passphrase
+  when: borg_ynh_backup_passphrase is defined
+  copy:
+    content: "{{ borg_ynh_backup_passphrase }}"
+    dest: "{{ borg_ynh_backup_passphrase_path }}"
+    backup: yes
+    owner: "{{ borg_ynh_backup_user }}"
+    mode: 0700

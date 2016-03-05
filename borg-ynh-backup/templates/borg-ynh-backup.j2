@@ -12,7 +12,7 @@ REPOSITORY={{ borg_ynh_backup_repository }}
 BACKUP_DATE=`date +%Y-%m-%d`
 ARCHIVE=${REPOSITORY}::$BACKUP_DATE
 export BORG_RSH="ssh -i {{ borg_ynh_backup_ssh_key }}"
-export BORG_PASSPHRASE="notsosecret"
+export BORG_PASSPHRASE="`cat {{ borg_ynh_backup_passphrase_path }}`"
 export BORG_KEYS_DIR="{{ borg_ynh_backup_home }}/.borg/keys"
 export BORG_CACHE_DIR="{{ borg_ynh_backup_home }}/.borg/cache"
 
