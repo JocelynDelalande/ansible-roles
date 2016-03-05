@@ -22,6 +22,16 @@ You can either :
 - Choose your own passphrase and set it via `borg_ynh_backup_passphrase` var
 - Let the playbook generate a strong one for you (be sure to back it up then)
 
+### Compression
+
+There is no compression by default, check
+[borg manual](http://borgbackup.readthedocs.org/en/stable/usage.html#borg-create)
+to see what option you can provice.
+
+Ex (maximum compression):
+
+    - borg_ynh_backup_compression: lzma,9
+
 Set up client & server
 ----------------------
 
@@ -36,8 +46,3 @@ If you set up both borg client and server, the easiest way is :
   by hand, somewhere offline :
   - *~borg/.borg/pass* folder
   - *~borg/.ssh/id_rsa* file
-
-TODO
-----
-
-- Use compression
