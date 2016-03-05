@@ -44,7 +44,7 @@ sudo -n $YNH_BACKUP_CREATE $BACKUP_DATE  >> ${LOG_PATH} 2>&1
 
 ts_log "Initializing repository, if needed."
 $BORG list ${REPOSITORY} >/dev/null 2>&1 || \
-  $BORG init --encryption=keyfile ${REPOSITORY} >> ${LOG_PATH} 2>&1
+  $BORG init --encryption=repokey ${REPOSITORY} >> ${LOG_PATH} 2>&1
 
 ts_log "Creating archive ${ARCHIVE}."
 sudo -n $BORG_BACKUP_PUSH $BACKUP_DATE >> ${LOG_PATH} 2>&1

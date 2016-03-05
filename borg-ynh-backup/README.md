@@ -35,4 +35,3 @@ TODO
 ----
 
 - Use compression
-- switch to repokey security
