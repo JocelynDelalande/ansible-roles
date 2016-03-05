@@ -46,3 +46,9 @@ If you set up both borg client and server, the easiest way is :
   by hand, somewhere offline :
   - *~borg/.borg/pass* folder
   - *~borg/.ssh/id_rsa* file
+
+
+TODO
+----
+
+- Re-enable ynh application backup
