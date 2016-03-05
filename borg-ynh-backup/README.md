@@ -21,12 +21,12 @@ Set up client & server
 
 If you set up both borg client and server, the easiest way is :
 
-- run borg-ynh-backup role on your client backup client
-- get the public key it created (default: */root/.ssh/id_rsa_borg*)
+- run borg-ynh-backup role against your yunohost server
+- get the public key it created (default: *~borg/.ssh/id_rsa.pub*)
 - setup the server, configuring the given public_key
-- perform a test run by hand running `/etc/cron.d/borg-ynh-backup` if nothing
-  appears, then it worked :-)
-- **backup your client private keys** (ssh, repo key and repo key passphrase),
+- perform a test (and check hostkey) running by hand
+  `~borg/bin/borg-ynh-backup` (as borg user).
+- **backup your client private keys** (ssh, and repository passphrase),
   by hand, somewhere offline :
   - *~borg/.borg/pass* folder
   - *~borg/.ssh/id_rsa* file
