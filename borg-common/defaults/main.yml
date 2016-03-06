@@ -1,3 +1,3 @@
-borg_version: 0.30.1
+borg_version: 1.0.0
 borg_archive_name: borgbackup-{{ borg_version }}.tar.gz
 borg_venv_path: /opt/borg/venv
