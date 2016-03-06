@@ -1,6 +1,8 @@
 borg − installation of borg backup program
 ==========================================
 
+*see also: borg-server, borg-ynh-backup*
+
 This role is required wether the host is a borg server or borg client.
 It fetches, verifies and install borg on an amd64 system.
 
