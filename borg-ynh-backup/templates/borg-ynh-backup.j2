@@ -40,7 +40,7 @@ ts_log "Cleaning up."
 sudo -n $YNH_BACKUP_CLEANUP
 
 ts_log "Performing yunohost backup."
-sudo -n $YNH_BACKUP_CREATE $BACKUP_DATE  >> ${LOG_PATH} 2>&1
+sudo -n $YNH_BACKUP_CREATE >> ${LOG_PATH} 2>&1
 
 ts_log "Initializing repository, if needed."
 $BORG list ${REPOSITORY} >/dev/null 2>&1 || \
