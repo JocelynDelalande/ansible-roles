@@ -27,6 +27,7 @@ trap '[ "$?" -eq 0 ] || cleanup' EXIT
 cleanup()
 {
     echo "Something bad happened during backup, check ${LOG_PATH}"
+    ts_log "Something bad happened during backup. Cleaning up."
     sudo -n $YNH_BACKUP_CLEANUP
     exit $1
 }
