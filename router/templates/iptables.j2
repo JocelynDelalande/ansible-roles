@@ -5,7 +5,7 @@
 :OUTPUT ACCEPT [10935:1902427]
 
 {% for rule in ip4_port_redirections %}
--A PREROUTING -i {{ vpn_iface }} -p {{ rule.proto }} --dport {{ rule.port }} -j DNAT --to {{ rule.host }}:{{ rule.port }}
+-A PREROUTING -i {{ vpn_iface }} -p {{ rule.proto }} --dport {{ rule.port }} -j DNAT --to {{ rule.host }}:{{ rule.dst_port | default(rule.port) }}
 {% endfor %}
 
 -A POSTROUTING -s {{ dmz_ip4 }} -o {{ vpn_iface }} -j MASQUERADE

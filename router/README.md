@@ -24,3 +24,5 @@ Related roles are *radvd*, *dnsmasq*, *haproxy-ip4-proxy*.
           - {proto: tcp, port: 80, host: 192.168.0.3}
        roles:
         - {role: router, tags: ['router']}
+
+port redirections take an optional `dst_port` attribute when destination port is different from incomming port.
