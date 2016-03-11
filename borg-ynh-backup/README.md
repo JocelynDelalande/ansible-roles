@@ -15,6 +15,9 @@ Backup Yunohost, via borg, to a remote repository over SSH.
       - borg_ynh_backup_weekly: 4
       - borg_ynh_backup_daily: 7
 
+You can optionaly pass options to the ssh command, ex:
+
+    borg_ynh_backup_ssh_options: -p 4242
 
 ### Passphrase
 
