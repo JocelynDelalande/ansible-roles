@@ -1,9 +1,6 @@
 - name: Check that borg is installed (see borg-common role)
   file: path={{ borg_ynh_backup_borg_path }} state=file follow=yes
 
-- include: passphrase.yml
-  tags: [borg.passphrase]
-
 - name: Create dedicated user
   user:
     name: "{{ borg_ynh_backup_user }}"
@@ -11,6 +8,9 @@
     generate_ssh_key: yes
     ssh_key_file: "{{ borg_ynh_backup_ssh_key }}"
     ssh_key_comment: "borg backup {{ borg_ynh_backup_user }}@{{ ansible_hostname }}"
+
+- include: passphrase.yml
+  tags: [borg.passphrase]
 
 - name: Create scripts directory
   file: path={{ borg_ynh_backup_bin_path }} mode=0655 owner=root group=root state=directory
