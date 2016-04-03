@@ -1,4 +1,7 @@
 ---
+  - name: flush handlers (in case nginx has to restart first)
+    meta: flush_handlers
+
   - apt: update_cache=yes cache_valid_time=3600
 
   - name: Install depends
