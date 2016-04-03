@@ -44,7 +44,7 @@ server {
 
 {% endif %}
 
-{% for location in item.locations %}
+{% for location in item.locations|default([]) %}
 
   location {{ location.path }} {
   {% if location.type == 'fastcgi' %}
