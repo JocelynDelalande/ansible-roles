@@ -1,0 +1,43 @@
+# {{ ansible_managed }}
+
+user              www-data;
+
+worker_processes  1;
+pid        /var/run/nginx.pid;
+
+events {
+    worker_connections  512;
+}
+
+http {
+        ssl_protocols TLSv1 TLSv1.1 TLSv1.2;
+        include /etc/nginx/mime.types;
+        default_type application/octet-stream;
+
+        access_log /var/log/nginx/access.log;
+        error_log /var/log/nginx/error.log;
+
+        charset  utf-8;
+
+        gzip on;
+        gzip_disable "msie6";
+
+         # Default vhosts
+         # To avoid ipv6only param errors
+         server {
+           listen [::]:80 ipv6only=off;
+           server_name _default;
+         }
+
+         server {
+           listen [::]:443 ipv6only=off;
+           server_name _default;
+           ssl on;
+           ssl_certificate /etc/ssl/certs/ssl-cert-snakeoil.pem;
+           ssl_certificate_key /etc/ssl/private/ssl-cert-snakeoil.key;
+         }
+
+
+        include /etc/nginx/conf.d/*.conf;
+        include /etc/nginx/sites-enabled/*;
+}

@@ -1,0 +1,86 @@
+# {{ ansible_managed }}
+
+server {
+{% if item.type == 'http' %}
+  listen [::]:80;
+{% elif item.type == 'https' %}
+  listen [::]:443;
+{% endif %}
+  server_name {{ item.domain }};
+
+{% if item.type == 'https' %}
+  ssl on;
+  ssl_certificate /etc/letsencrypt/live/{{ item.domain }}/fullchain.pem;
+  ssl_certificate_key /etc/letsencrypt/live/{{ item.domain }}/privkey.pem;
+{% endif %}
+
+  access_log /var/log/{{ item.domain }}-{{ item.type }}.access.log;
+{% if ansible_lsb.codename !=  "wheezy" %}
+  error_log /var/log/{{ item.domain }}-{{ item.type }}.error.log;
+{% endif %}
+
+{% if item.features is defined %}
+
+  {% if 'no-robots' in item.features %}
+
+  location /robots.txt {
+    return 200 "User-agent: *\nDisallow: /";
+  }
+  {% endif %}
+
+  {% if 'letsencrypt-check' in item.features %}
+
+  location /.well-known/acme-challenge {
+    root /var/www/letsencrypt_webroot;
+  }
+  {% endif %}
+
+  {% if 'ssl-redirection' in item.features %}
+
+  location / {
+    rewrite ^ https://$http_host$request_uri? permanent;
+  }
+  {% endif %}
+
+{% endif %}
+
+{% for location in item.locations %}
+
+  location {{ location.path }} {
+  {% if location.type == 'fastcgi' %}
+
+    fastcgi_param CONTENT_LENGTH $content_length;
+    fastcgi_param CONTENT_TYPE $content_type;
+    fastcgi_param HTTP_SCHEME {{ item.type }};
+    fastcgi_param HTTPS {% if item.type == 'https' %}True{% else %}False{% endif %};
+    fastcgi_param PATH_INFO $fastcgi_script_name;
+    fastcgi_param QUERY_STRING $query_string;
+    fastcgi_param REQUEST_METHOD $request_method;
+    fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+    fastcgi_param SERVER_ADDR $server_addr;
+    fastcgi_param SERVER_NAME $server_name;
+    fastcgi_param SERVER_PORT $server_port;
+    fastcgi_param SERVER_PROTOCOL $server_protocol;
+    fastcgi_pass {{ location.target }};
+  {% elif location.type == 'reverse-proxy' %}
+
+    proxy_pass {{ location.target }};
+    proxy_set_header Host $host;
+  {% elif location.type == 'static' %}
+
+    {% if location.root is defined %}root {{ location.root }};{% endif %}
+    {% if location.target is defined %}alias {{ location.target }};{% endif %}
+
+  {% elif location.type == 'domain-redirection' %}
+    rewrite ^ {{ location.target }}$request_uri? permanent;
+
+  {% endif %}
+  {% for k,v in location.vars|default([]) %}
+
+    {{ k }} {{ v }};
+  {% endfor %}
+
+  }
+{% endfor %}
+
+}
