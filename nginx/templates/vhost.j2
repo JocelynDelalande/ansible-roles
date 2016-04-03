@@ -44,6 +44,11 @@ server {
 
 {% endif %}
 
+{% for k,v in item.vars|default([]) %}
+
+  {{ k }} {{ v }};
+{% endfor %}
+
 {% for location in item.locations|default([]) %}
 
   location {{ location.path }} {
