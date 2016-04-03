@@ -47,7 +47,7 @@
     command: "{{ letsencrypt_command }} -a webroot --webroot-path {{ letsencrypt_webroot_path }} certonly -d {{ item }}"
     args:
       creates: "/etc/letsencrypt/live/{{ item }}"
-    with_items: letsencrypt_cert_domains
+    with_items: "{{ letsencrypt_cert_domains }}"
 
   - name: Install cron
     apt: name=cron
