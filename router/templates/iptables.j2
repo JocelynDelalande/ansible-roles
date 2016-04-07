@@ -10,7 +10,7 @@
 
 -A POSTROUTING -s {{ dmz_ip4 }} -o {{ vpn_iface }} -j MASQUERADE
 -A PREROUTING -d {{ public_ip4 }} -p tcp -j DNAT --to-destination {{ dmz_ip4_host }}
--A OUTPUT -d 80.67.179.33 -p tcp -j DNAT --to-destination {{ dmz_ip4_host }}
+-A OUTPUT -d {{ public_ip4 }} -p tcp -j DNAT --to-destination {{ dmz_ip4_host }}
 
 COMMIT
 # Completed on Thu Sep 18 03:37:03 2014
@@ -20,4 +20,3 @@ COMMIT
 :FORWARD ACCEPT [1355117:850726711]
 :OUTPUT ACCEPT [1445991:517750931]
 COMMIT
-
