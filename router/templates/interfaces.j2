@@ -21,4 +21,12 @@ iface {{ dmz_iface }} inet static
     # otherwise the up/down fails.
     up ip a a {{ dmz_ip6 }} dev {{ dmz_iface }}
 
-
+{% if _6to4_iface is defined %}
+auto {{ _6to4_iface }}
+iface {{ _6to4_iface }} inet6 v4tunnel
+	address {{ _6to4_local_ipv6 }}
+	local {{ _6to4_local_ipv4 }}
+	endpoint {{ _6to4_remote_ipv4 }}
+	up ip route add ::/0  dev {{ _6to4_iface }}
+	down ip -6 route del ::/0 dev  {{ _6to4_iface }}
+{% endif %}
