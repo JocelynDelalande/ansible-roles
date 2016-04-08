@@ -3,7 +3,7 @@
 :INPUT ACCEPT [3042:265664]
 :FORWARD ACCEPT [1054726:351421618]
 :OUTPUT ACCEPT [2499:224234]
--A FORWARD -o {{ vpn_iface }} -p tcp -m tcp --tcp-flags SYN,RST SYN -j TCPMSS --set-mss 1200
--A FORWARD -i {{ vpn_iface }} -p tcp -m tcp --tcp-flags SYN,RST SYN -j TCPMSS --set-mss 1200
+-A FORWARD -o {{ wan_ip6_iface }} -p tcp -m tcp --tcp-flags SYN,RST SYN -j TCPMSS --set-mss 1200
+-A FORWARD -i {{ wan_ip6_iface }} -p tcp -m tcp --tcp-flags SYN,RST SYN -j TCPMSS --set-mss 1200
 COMMIT
 # Completed on Thu Sep 18 04:12:50 2014
