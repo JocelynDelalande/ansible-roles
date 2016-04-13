@@ -1,0 +1,11 @@
+- name: Ensure backports repository is enabled
+  apt_repository: repo="deb http://httpredir.debian.org/debian jessie-backports main"
+
+- name: Install borgbackup
+  apt: pkg=borgbackup cache_valid_time=1800 default_release=jessie-backports
+
+- name: Remove pip-installed borgbackup symlink
+  file: path=/usr/local/bin/borg state=absent
+
+- name: Remove pip-installed borgbackup installation
+  file: path=borg_venv_path state=absent
