@@ -3,7 +3,7 @@ borg_ynh_backup_home: "/home/{{ borg_ynh_backup_user }}"
 borg_ynh_backup_ssh_key: "{{ borg_ynh_backup_home }}/.ssh/id_rsa"
 borg_ynh_backup_log_path: /var/log/borg-ynh-backup.log
 borg_ynh_backup_tmp_path: /home/yunohost.backup/borg-tmp/
-borg_ynh_backup_borg_path: /usr/local/bin/borg
+borg_ynh_backup_borg_path: /usr/bin/borg
 borg_ynh_backup_passphrase_path: "{{ borg_ynh_backup_home }}/.borg/pass/borg-ynh-passphrase"
 
 borg_ynh_backup_bin_path: "{{ borg_ynh_backup_home }}/bin"
