@@ -1,0 +1,5 @@
+- name: Install btrfs maintenance cron script
+  template:
+    src: templates/btrfs_maintenance
+    dest: /etc/cron.weekly/btrfs_maintenance
+    mode: 0755
