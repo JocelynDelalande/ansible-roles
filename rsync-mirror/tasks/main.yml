@@ -37,7 +37,7 @@
 - name: Find rsync server remote key
   command: ssh-keyscan "{{ item.remote_host }}"
   register: rsync_server_host_key
-  sudo_user: "{{ item.local_user }}"
+  become_user: "{{ item.local_user }}"
   with_items: rsync_mirror_mirrors
 
 - name: Adds server host key if not already present

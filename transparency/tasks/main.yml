@@ -13,7 +13,7 @@
   user: name={{ transparency_user }} home={{ transparency_home_dir }}
 
 - name: fetch application sources
-  sudo: yes
+  become: yes
   git:
     repo: '{{ transparency_git_repo_url }}'
     dest: '{{ transparency_install_dir }}'
@@ -30,24 +30,24 @@
     recurse: yes
 
 - name: create virtualenv
-  sudo: yes
-  sudo_user: '{{ transparency_user }}'
+  become: yes
+  become_user: '{{ transparency_user }}'
   shell: virtualenv {{ transparency_venv_dir }} --python=/usr/bin/python3 creates={{ transparency_venv_dir }}
 
 - name: install pip requirements
-  sudo: yes
-  sudo_user: '{{ transparency_user }}'
+  become: yes
+  become_user: '{{ transparency_user }}'
   pip:
     requirements: '{{ transparency_install_dir }}/requirements.txt'
     virtualenv: '{{ transparency_venv_dir }}'
 
 - name: install gunicorn
-  sudo: yes
-  sudo_user: '{{ transparency_user }}'
+  become: yes
+  become_user: '{{ transparency_user }}'
   pip: name=gunicorn virtualenv={{ transparency_venv_dir }}
 
 - name: set local_settings.py
-  sudo_user: '{{ transparency_user }}'
+  become_user: '{{ transparency_user }}'
   template:
     src: local_settings.j2
     dest: "{{ transparency_install_dir }}/transparency/local_settings.py"
@@ -55,8 +55,8 @@
   notify: restart transparency
 
 - name: migrate db
-  sudo: yes
-  sudo_user: '{{ transparency_user }}'
+  become: yes
+  become_user: '{{ transparency_user }}'
   shell: ./manage.py migrate --noinput
   args:
     chdir: '{{ transparency_install_dir }}'
@@ -73,8 +73,8 @@
     recurse: yes
 
 - name: collect static files
-  sudo: yes
-  sudo_user: '{{ transparency_user }}'
+  become: yes
+  become_user: '{{ transparency_user }}'
   shell: './manage.py collectstatic --noinput'
   args:
     chdir: '{{ transparency_install_dir }}'
