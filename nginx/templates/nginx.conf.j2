@@ -22,6 +22,8 @@ http {
         gzip on;
         gzip_disable "msie6";
 
+        client_max_body_size 5M;
+
          # Default vhosts
          # To avoid ipv6only param errors
          server {
