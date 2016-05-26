@@ -7,8 +7,9 @@ my needs.
 
 Oh, and they all are using Debian systems.
 
-They are licensing under the [WTFPL](http://www.wtfpl.net/txt/copying/)
-
+They are licensed under the [WTFPL](http://www.wtfpl.net/txt/copying/), except
+when another is mentioned inside a role folder (these are external roles I
+reuse).
 
 Layout
 ------
