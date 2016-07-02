@@ -14,9 +14,9 @@ server {
   ssl_certificate_key /etc/letsencrypt/live/{{ item.domain }}/privkey.pem;
 {% endif %}
 
-  access_log /var/log/{{ item.domain }}-{{ item.type }}.access.log;
+  access_log /var/log/nginx/{{ item.nick|default(item.domain) }}-{{ item.type }}.access.log;
 {% if ansible_lsb.codename !=  "wheezy" %}
-  error_log /var/log/{{ item.domain }}-{{ item.type }}.error.log;
+  error_log /var/log/nginx/{{ item.nick|default(item.domain) }}-{{ item.type }}.error.log;
 {% endif %}
 
 {% if item.features is defined %}

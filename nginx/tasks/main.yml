@@ -16,14 +16,14 @@
 - name: Install vhosts settings
   template:
     src: vhost.j2
-    dest: "/etc/nginx/sites-available/{{ item.domain }}-{{ item.type }}"
+    dest: "/etc/nginx/sites-available/{{ item.nick|default(item.domain) }}-{{ item.type }}"
   with_items: '{{ nginx_vhosts }}'
   notify: Restart nginx
 
 - name: Enable vhosts
   file:
-    src: "/etc/nginx/sites-available/{{ item.domain }}-{{ item.type }}"
-    dest: "/etc/nginx/sites-enabled/{{ item.domain }}-{{ item.type }}"
+    src: "/etc/nginx/sites-available/{{ item.nick|default(item.domain) }}-{{ item.type }}"
+    dest: "/etc/nginx/sites-enabled/{{ item.nick|default(item.domain) }}-{{ item.type }}"
     state: link
   with_items: '{{ nginx_vhosts }}'
   notify: Restart nginx
