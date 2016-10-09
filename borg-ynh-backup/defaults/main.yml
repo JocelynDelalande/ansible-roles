@@ -12,3 +12,4 @@ borg_ynh_backup_sudoed_push: "{{ borg_ynh_backup_bin_path }}/borg-backup-push"
 borg_ynh_backup_sudoed_cleanup: "{{ borg_ynh_backup_bin_path }}/ynh-backup-cleanup"
 borg_ynh_backup_backup_script: "{{ borg_ynh_backup_bin_path }}/borg-ynh-backup"
 borg_ynh_backup_compression: no
+borg_ynh_backup_ssh_options: ''
