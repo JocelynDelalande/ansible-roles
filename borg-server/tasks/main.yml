@@ -14,7 +14,7 @@
     group: "{{ borg_server_user }}"
     owner: "{{ borg_server_user }}"
     mode: 0750
-  with_items: borg_server_backup_clients
+  with_items: " {{ borg_server_backup_clients }}"
 
 - name: Create ssh dir
   file: name="~{{ borg_server_user }}/.ssh/" state=directory mode=0750 owner="{{ borg_server_user }}" group="{{ borg_server_user }}"
