@@ -13,7 +13,6 @@
     - liblz4-1
     - build-essential
   become: yes
-  when: borg
 
 - name: Create borg install dir
   file: path={{ borg_venv_path }} state=directory recurse=yes
