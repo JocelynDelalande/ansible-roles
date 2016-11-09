@@ -14,13 +14,13 @@
   command: >
     btrfs subvolume create {{ rsync_server_path }}/{{ item.name }}
     creates={{ rsync_server_path }}/{{ item.name }}
-  with_items: rsync_server_backup_clients
+  with_items: "{{ rsync_server_backup_clients }}"
 
 - name: Create incoming btrfs subvolumes
   command: >
     btrfs subvolume create {{ rsync_server_path }}/{{ item.name }}/incoming
     creates={{ rsync_server_path }}/{{ item.name }}/incoming
-  with_items: rsync_server_backup_clients
+  with_items: "{{ rsync_server_backup_clients }}"
 
 - name: Create main folder
   file:
@@ -29,7 +29,7 @@
     group: "{{ rsync_server_user }}"
     owner: root
     mode: 0750
-  with_items: rsync_server_backup_clients
+  with_items: "{{ rsync_server_backup_clients }}"
 
 - name: Create incoming r/w folder
   file:
@@ -37,7 +37,7 @@
     state: directory
     owner: "{{ rsync_server_user }}"
     mode: 0700
-  with_items: rsync_server_backup_clients
+  with_items: "{{ rsync_server_backup_clients }}"
 
 - name: Create snapshots r-o folder
   file:
@@ -46,7 +46,7 @@
     owner: "root"
     group: "{{ rsync_server_user }}"
     mode: 0750
-  with_items: rsync_server_backup_clients
+  with_items: "{{ rsync_server_backup_clients }}"
 
 - name: Create base dir to store backups
   file: name="~{{ rsync_server_user }}/.ssh/" state=directory mode=0750 owner="{{ rsync_server_user }}" group="{{ rsync_server_user }}"
