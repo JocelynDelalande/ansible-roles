@@ -56,6 +56,9 @@ Example:
         - `path` is the local path you want to allow pulling data from.
         - `ssh_pubkey` is the pubkey, as appearing verbatim  in the *.pub* file SSH generates.
 
+    - `rsync_server_removed_backup_clients` is a list of old backup clients you want
+      to deconfigure.
+
 Limits
 ------
 

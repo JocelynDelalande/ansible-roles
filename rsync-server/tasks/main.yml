@@ -57,3 +57,19 @@
     dest: "~{{ rsync_server_user }}/.ssh/authorized_keys"
     owner: "{{ rsync_server_user }}"
     mode: 0700
+
+- name: Remove old backup client  incoming btrfs subvolumes
+  command: >
+    btrfs subvolume delete {{ rsync_server_path }}/{{ item }}/incoming
+    removes={{ rsync_server_path }}/{{ item }}/incoming
+  with_items: "{{ rsync_server_removed_backup_clients }}"
+
+- name: Delete old backup client dedicated btrfs main subvolumes
+  command: >
+    btrfs subvolume delete {{ rsync_server_path }}/{{ item }}
+    removes={{ rsync_server_path }}/{{ item }}
+  with_items: "{{ rsync_server_removed_backup_clients }}"
+
+- name: Remove old clients backup dirs
+  file: name={{ rsync_server_path }}/{{ item }} state=absent
+  with_items: "{{ rsync_server_removed_backup_clients }}"
