@@ -1,0 +1,5 @@
+- name: Rsync backup config dir is absent
+  file: path=/etc/rsync-backup state=absent
+
+- name: Ensure cron backup script is absent
+  file: path=/etc/cron.daily/rsync-backup state=absent
