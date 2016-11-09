@@ -87,3 +87,12 @@ Restart it (so that ssh & co starts properly)
     lxc-stop -n ${myhostname} -r
 
 New host is now ready to be added to the inventory and ansibled!
+
+
+Deleting a container
+--------------------
+
+Simply list containers names in `deleted_dmz_hosts`
+
+    lxc_host_deleted_containers:
+      - old_container_name

@@ -1,20 +1,28 @@
-- name: Install lxc package
-  apt: pkg=lxc state=installed
+- name: Install lxc packages
+  # Only jessie-backports offers both lxc and python-lxc
+  apt: pkg={{ item }} state=installed default_release=jessie-backports
+  with_items:
+    - lxc
+    - python-lxc
 
 - name : Put containers config
   template: src=base.j2 dest="/var/lib/lxc/{{ item.name }}/config"
-  with_items: dmz_hosts
+  with_items: "{{ dmz_hosts }}"
   when: item.lxc | default(None)
   tags: [lxc]
 
 - name : Patch jessie containers system
   copy: src=system dest="/var/lib/lxc/{{ item.name }}/rootfs/etc/systemd/system"
-  with_items: dmz_hosts
+  with_items: "{{ dmz_hosts }}"
   when: item.lxc | default(None) and item.lxc.version == 'jessie'
   tags: [lxc]
 
 - name : Remove /dev/kmsg from jessie containers
   file: state=absent path="/var/lib/lxc/{{ item.name }}/rootfs.dev/kmsg"
-  with_items: dmz_hosts
+  with_items: "{{ dmz_hosts }}"
   when: item.lxc | default(None) and item.lxc.version == 'jessie'
   tags: [lxc]
+
+- name: Remove deleted containers config
+  lxc_container: name={{ item }} state=absent
+  with_items: "{{ lxc_host_deleted_containers }}"
