@@ -1,5 +1,6 @@
 borg_ynh_backup_user: borg
 borg_ynh_backup_home: "/home/{{ borg_ynh_backup_user }}"
+borg_ynh_backup_extra_dirs: []
 borg_ynh_backup_ssh_key: "{{ borg_ynh_backup_home }}/.ssh/id_rsa"
 borg_ynh_backup_log_path: /var/log/borg-ynh-backup.log
 borg_ynh_backup_tmp_path: /home/yunohost.backup/borg-tmp/

@@ -15,7 +15,7 @@ export BORG_CACHE_DIR="{{ borg_ynh_backup_home }}/.borg/cache"
 
 {{ borg_ynh_backup_borg_path }} create \
     -v --stats --compression {{ borg_ynh_backup_compression }} \
-    "${ARCHIVE}" ${TMP_PATH}
+    "${ARCHIVE}" ${TMP_PATH} {% for i in borg_ynh_backup_extra_dirs %} {{ i }}{% endfor %}
 
 # Give back the backup cache to the dedicated user
 chown -R {{ borg_ynh_backup_user }}:{{ borg_ynh_backup_user }} \

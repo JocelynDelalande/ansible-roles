@@ -19,6 +19,12 @@ You can optionaly pass options to the ssh command, ex:
 
     borg_ynh_backup_ssh_options: -p 4242
 
+You can optionaly mention extra dirs to backup:
+
+    borg_ynh_backup_extra_dirs:
+      - "/var/foo"
+      - "/home/jack"
+
 ### Passphrase
 
 You can either :
