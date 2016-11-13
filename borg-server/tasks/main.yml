@@ -2,7 +2,7 @@
   user: name={{ borg_server_user }} home={{ borg_server_home }}
 
 - name: Check that borg is installed (see borg-common role)
-  file: path=/usr/local/bin/borg state=file follow=yes
+  command: "which borg"
 
 - name: Create base dir to store backups
   file: name="{{ borg_server_repositories }}" state=directory
