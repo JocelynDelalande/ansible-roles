@@ -3,7 +3,7 @@
 
 - name: Add packages.crapouillou.net repository
   apt_repository:
-    repo: "deb http://packages.crapouillou.net wheezy/"
+    repo: "deb http://packages.crapouillou.net jessie/"
 
 - name: Installs packages.crapouillou.net repository key
   apt_key:
