@@ -16,7 +16,6 @@ iface {{ dmz_iface }} inet static
 	bridge_fd 0
     bridge_stp off
     bridge_maxwait 0
-	post-up /sbin/ethtool -K {{ dmz_iface }} tx off rx off
     # That is ugly but needed : cant have 2 stanzas for same bridge
     # otherwise the up/down fails.
     up ip a a {{ dmz_ip6 }} dev {{ dmz_iface }}

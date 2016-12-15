@@ -1,0 +1,24 @@
+#!/bin/bash
+#
+# Disables TCP offloading on all ifaces
+#
+# Inspired by: @Michelunik https://serverfault.com/a/422554/62953
+
+RUN=true
+case "${IF_NO_TOE,,}" in
+    no|off|false|disable|disabled)
+        RUN=false
+    ;;
+esac
+
+
+# Other offloading options that could be disabled (not TCP related):
+#  sg tso ufo gso gro lro rxvlan txvlan rxhash
+# see man ethtool
+
+if [ "$MODE" = start -a "$RUN" = true ]; then
+  TOE_OPTIONS="rx tx"
+  for TOE_OPTION in $TOE_OPTIONS; do
+    /sbin/ethtool --offload "$IFACE" "$TOE_OPTION" off &>/dev/null || true
+  done
+fi

@@ -19,3 +19,14 @@
 - name: Set IPv6 firewall rules
   template: src=ip6tables.j2 dest=/etc/ip6tables
   notify: reload firewall rules
+
+# TCP offloading with e1000e module was buggy with errors like
+# e1000e 0000:00:19.0 eth0: Detected Hardware Unit Hang
+# ...
+# e1000e 0000:00:19.0 eth0: Reset adapter unexpectedly
+# See http://serverfault.com/questions/616485/
+- name: Disable TCP offloading features
+  copy:
+    src: files/if-up-disable-tcp-offloading
+    dest: /etc/network/if-up.d/disable-tcp-offloading
+    mode: 0744
