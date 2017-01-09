@@ -1,0 +1,31 @@
+- name: install apt dependencies
+  apt: pkg={{ item }}
+  with_items:
+    - python3
+    - python3-dev
+    - libzmq-dev
+    - python-virtualenv
+
+- name: create dedicated user
+  user: name=jupyter home=/opt/jupyter
+
+- name: create notebooks dir
+  file: path=/opt/jupyter/notebooks state=directory owner=jupyter
+
+- name: install recent pip
+  pip: name=pip virtualenv_python=python3 virtualenv=/opt/jupyter/venv
+  become: jupyter
+
+- name: install jupyter
+  pip: name=jupyter virtualenv=/opt/jupyter/venv
+  become: jupyter
+  notify: restart jupyter
+
+- name: systemd script is in place
+  template:
+    src: jupyter.service.j2
+    dest: /etc/systemd/system/jupyter.service
+  notify: restart jupyter
+
+- name: ensure jupyter is started
+  service: name=jupyter state=started

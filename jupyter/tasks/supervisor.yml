@@ -1,0 +1,9 @@
+- name: install supervisor
+  apt: pkg=supervisor
+  notify: restart supervisor
+
+- name: copy jupyter supervisor file
+- template:
+    src: jupyter-supervisor.conf.j2
+    dest: /etc/supervisor/conf.d/jupyter.conf
+  notify: restart supervisor

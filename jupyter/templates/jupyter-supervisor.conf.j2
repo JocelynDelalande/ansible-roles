@@ -1,0 +1,14 @@
+[program:jupyter]
+command=/opt/jupyter/bin/jupyter notebook --notebook-dir=/opt/jupyter/notebooks --no-browser --NotebookApp.allow_origin='*'
+process_name=worker-jupyter-%(process_num)02d
+# TODO amb: take more than `1` here
+numprocs=1
+startretries=9999
+directory=/opt/jupyter
+autostart=true
+autorestart=true
+user=jupyter
+stdout_logfile=/var/log/supervisor_jupyter_stdout.log
+stdout_logfile_maxbytes=1MB
+stderr_logfile=/var/log/supervisor_jupyter_stderr.log
+stderr_logfile_maxbytes=1MB

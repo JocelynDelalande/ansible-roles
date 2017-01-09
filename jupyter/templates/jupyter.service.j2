@@ -1,0 +1,12 @@
+[Unit]
+Description=Jupyter
+After=network.target
+
+[Service]
+User=jupyter
+Group=jupyter
+WorkingDirectory=/opt/jupyter/
+ExecStart=/opt/jupyter/venv/bin/jupyter notebook --notebook-dir=/opt/jupyter/notebooks --no-browser --NotebookApp.allow_origin='*' "--ip=::1" {% if jupyter_access_token is defined =}--NotebookApp.token={{ jupyter_access_token }}{% endif %}
+
+[Install]
+WantedBy=multi-user.target
