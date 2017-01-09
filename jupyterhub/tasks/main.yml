@@ -1,0 +1,19 @@
+- name: install apt dependencies
+  apt: pkg={{ item }}
+  with_items:
+    - npm
+    - nodejs-legacy
+
+- name: create dedicated user
+  user: name=jupyterhub home=/opt/jupyterhub
+
+- name: install jupyterhub
+  pip: name=jupyterhub virtualenv=/opt/jupyterhub/venv
+  become: jupyterhub
+  notify: restart jupyterhub
+
+- name: systemd script is in place
+  template:
+    src: jupyterhub.service.j2
+    dest: /etc/systemd/system/jupyterhub.service
+  notify: restart jupyterhub

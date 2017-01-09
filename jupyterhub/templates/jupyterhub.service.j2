@@ -1,0 +1,10 @@
+[Unit]
+Description=JupyterHub
+After=network.target
+
+[Service]
+WorkingDirectory=/opt/jupyterhub/
+ExecStart=/opt/jupyter/venv/bin/jupyterhub
+
+[Install]
+WantedBy=multi-user.target
