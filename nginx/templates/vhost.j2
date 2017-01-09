@@ -67,10 +67,15 @@ server {
     fastcgi_param SERVER_PORT $server_port;
     fastcgi_param SERVER_PROTOCOL $server_protocol;
     fastcgi_pass {{ location.target }};
-  {% elif location.type == 'reverse-proxy' %}
-
+  {% elif location.type in ('reverse-proxy', 'reverse-proxy-websocket') %}
     proxy_pass {{ location.target }};
     proxy_set_header Host $host;
+    {% if location.type ==  'reverse-proxy-websocket' %}
+      proxy_http_version 1.1;
+      proxy_set_header Upgrade $http_upgrade;
+      proxy_set_header Connection "upgrade";
+    {% endif %}
+
   {% elif location.type == 'static' %}
 
     {% if location.root is defined %}root {{ location.root }};{% endif %}
