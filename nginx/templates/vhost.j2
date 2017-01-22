@@ -82,7 +82,7 @@ server {
     {% if location.target is defined %}alias {{ location.target }};{% endif %}
 
   {% elif location.type == 'domain-redirection' %}
-    rewrite ^ {{ location.target }}$request_uri? permanent;
+    rewrite ^ {{ location.target }}$request_uri permanent;
 
   {% endif %}
   {% for k,v in location.vars|default([]) %}
