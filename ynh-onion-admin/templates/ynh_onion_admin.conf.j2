@@ -1,0 +1,54 @@
+# {{ ansible_managed }}
+#
+# Essentialy copied from default yunohost_admin.conf :
+# - removing the `default_server` options
+# - adding the `server_name` directive
+
+server {
+    listen 80;
+    listen [::]:80;
+
+    server_name {{ ynh_onion_admin_onion_name }};
+
+    location / {
+        return 302 https://$http_host/yunohost/admin;
+    }
+
+    location /yunohost/admin {
+        return 301 https://$http_host$request_uri;
+    }
+}
+
+server {
+    listen 443 ssl;
+    listen [::]:443 ssl;
+
+    server_name {{ ynh_onion_admin_onion_name }};
+
+    ssl_certificate /etc/yunohost/certs/yunohost.org/crt.pem;
+    ssl_certificate_key /etc/yunohost/certs/yunohost.org/key.pem;
+    ssl_session_timeout 5m;
+    ssl_session_cache shared:SSL:50m;
+    ssl_prefer_server_ciphers on;
+    ssl_protocols TLSv1 TLSv1.1 TLSv1.2;
+    ssl_ciphers ALL:!aNULL:!eNULL:!LOW:!EXP:!RC4:!3DES:+HIGH:+MEDIUM;
+
+    add_header Strict-Transport-Security "max-age=31536000;";
+
+    location / {
+        return 302 https://$http_host/yunohost/admin;
+    }
+
+    location /yunohost {
+        # Block crawlers bot
+        if ($http_user_agent ~ (crawl|Googlebot|Slurp|spider|bingbot|tracker|click|parser|spider|facebookexternalhit) ) {
+            return 403;
+        }
+
+        # Redirect most of 404 to maindomain.tld/yunohost/sso
+        access_by_lua_file /usr/share/ssowat/access.lua;
+    }
+
+    include conf.d/yunohost_admin.conf.inc;
+    include conf.d/yunohost_api.conf.inc;
+}

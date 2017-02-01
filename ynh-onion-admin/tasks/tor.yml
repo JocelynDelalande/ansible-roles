@@ -1,0 +1,28 @@
+- name: Install Tor
+  apt: name=tor update_cache=yes cache_valid_time=1800
+  notify: restart tor
+
+- name: Add required lines in torrc
+  lineinfile: dest=/etc/tor/torrc line={{ item }}
+  with_items:
+    - "HiddenServiceDir  /var/lib/tor/hidden_service/"
+    - "HiddenServicePort 80 127.0.0.1:80"
+    - "HiddenServicePort 443 127.0.0.1:443"
+  notify: restart tor
+
+- name: restart tor now, required (required for .onion generation)
+  meta: flush_handlers
+
+- name: Wait for Tor HS directory to become available
+  wait_for: path=/var/lib/tor/hidden_service/hostname
+
+- name: Register onion-name
+  shell: cat /var/lib/tor/hidden_service/hostname
+  register: cat_hidden_service
+
+- name: Store onion-name as a fact
+  set_fact:
+    ynh_onion_admin_onion_name: "{{ cat_hidden_service.stdout }}"
+
+- name: Summary
+  debug: msg="Your hidden service is now configured. You can access it at http://{{ ynh_onion_admin_onion_name }}."

@@ -1,0 +1,21 @@
+- name: Find all domains
+  command: "yunohost --output-as plain domain list"
+  register: domains
+
+- name: Disable admin+API on all domains
+  replace:
+    dest: "/etc/nginx/conf.d/{{ item }}.conf"
+    regexp: "^    include conf[.]d/yunohost_(admin|api)[.]conf[.]inc[;]"
+    replace: '# yunohost \1 disabled in favor of onion-only access'
+  with_items: "{{ domains.stdout_lines }}"
+  notify: reload nginx
+
+# Using https because, ynh-api websockets seems to operate only over https
+- name: Make the yunohost_admin vhost onion-only
+  template:
+    src: ynh_onion_admin.conf.j2
+    dest: /etc/nginx/conf.d/yunohost_admin.conf
+    owner: www-data
+    mode: 0700
+
+  notify: reload nginx
