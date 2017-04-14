@@ -8,6 +8,7 @@
     - cmake
     - libmpdclient-dev
     - openssl
+    - libssl-dev
 
 - name: Clone ympd
   git: repo="{{ ympd_git_repo }}" dest="{{ ympd_clone_dir }}"
