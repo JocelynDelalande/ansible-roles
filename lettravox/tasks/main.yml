@@ -51,7 +51,7 @@
 - name: install gunicorn
   become: yes
   become_user: '{{ lettravox_user }}'
-  pip: name=gunicorn virtualenv={{ lettravox_venv_dir }}
+  pip: name=gunicorn virtualenv={{ lettravox_venv_dir }} version=19.6
 
 - name: set local_settings.py
   become_user: '{{ lettravox_user }}'
