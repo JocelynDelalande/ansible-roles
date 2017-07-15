@@ -6,8 +6,14 @@ iface lo inet loopback
 #auto eth0
 #iface eth0 inet manual
 
-auto eth0.10
-iface eth0.10 inet dhcp
+auto {{ wan_ip4_iface }}
+iface {{ wan_ip4_iface }} inet dhcp
+
+{% if wan_ip6 is defined and wan_ip6_gateway is defined %}
+iface {{ wan_ip6_iface }} inet6 static
+	address {{ wan_ip6 }}
+    gateway {{ wan_ip6_gateway }}
+{% endif %}
 
 auto {{ dmz_iface }}
 iface {{ dmz_iface }} inet static
