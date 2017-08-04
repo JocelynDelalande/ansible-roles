@@ -1,0 +1,4 @@
+munin_node_custom_plugins_path: /usr/local/munin/lib/plugins
+munin_node_custom_plugins:
+  - ubntdiscovery_
+  - mpower_

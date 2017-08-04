@@ -1,0 +1,39 @@
+
+- name: Install munin-node and smartmontools
+  apt: pkg={{item}} state=present
+  with_items:
+    - munin-node
+    - smartmontools
+
+- include: custom-plugins.yml
+
+- name: Allow our munin-master(s)
+  blockinfile:
+    dest: /etc/munin/munin-node.conf
+    marker: "### {mark} ANSIBLE MANAGED BLOCK ###"
+    content: |
+      {% for i in munin_master_hosts %}
+      allow {{ i }}
+      {% endfor %}
+  notify: restart munin-node
+
+- name: enable munin modules
+  file:
+    src: "{% if item.name in munin_node_custom_plugins %}{{ munin_node_custom_plugins_path }}{% else %}/usr/share/munin/plugins{% endif %}/{{ item.name }}"
+    dest: "/etc/munin/plugins/{{ item.name}}{{ item.get('arg', '') }}"
+    state: link
+  with_items: "{{ munin_enabled_modules }}"
+  notify: restart munin-node
+
+- name: disable munin modules
+  file: path=/etc/munin/plugins/{{ item }} state=absent
+  with_items: "{{ munin_disabled_modules }}"
+  notify: restart munin-node
+
+# See https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=788736#12
+# This task could go away as soon as the Debian bugfix lands into stable
+- name: fix df and df_inode modules to prevent false positives
+  copy:
+    src: files/plugin-conf-fix-df-false-positive-fix
+    dest: /etc/munin/plugin-conf.d/df-false-positive-fix
+  notify: restart munin-node

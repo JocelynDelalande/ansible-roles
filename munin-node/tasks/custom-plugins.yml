@@ -1,0 +1,27 @@
+- name: Ensure custom plugins dependencies are installed
+  apt: pkg={{ item }} cache_valid_time=1800
+  with_items:
+    - python3-minimal
+    - python-pycurl
+
+- name: Create custom plugins dir
+  file:
+    path: "{{ munin_node_custom_plugins_path }}"
+    owner: munin
+    group: munin
+    state: directory
+
+- name: Deploy custom plugins
+  copy:
+    src: "files/plugins/{{ item }}"
+    dest: "{{ munin_node_custom_plugins_path }}/{{ item }}"
+    mode: 0755
+  with_items: "{{ munin_node_custom_plugins }}"
+  notify: restart munin-node
+
+- name: Deploy custom plugin configs
+  copy:
+    src: "{{ item }}"
+    dest: "/etc/munin/plugin-conf.d/"
+  with_fileglob: "files/plugin-confs/*"
+  notify: restart munin-node

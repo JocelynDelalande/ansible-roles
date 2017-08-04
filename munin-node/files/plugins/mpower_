@@ -1,0 +1,139 @@
+#!/usr/bin/env python2
+#! -*- coding: utf-8 -*-
+"""
+ Copyright ⓒ 2014 CNRS/LAAS
+ Copyright ⓒ 2017 Jocelyn Delalande
+
+ Permission to use, copy, modify, and distribute this software for any
+ purpose with or without fee is hereby granted, provided that the above
+ copyright notice and this permission notice appear in all copies.
+
+ THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+ WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+ MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+ ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+ WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+ ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+"""
+# Comme mentioné dans la notice ci-dessus, une partie du code est dérivée du travail de mherbb
+# https://git.openrobots.org/projects/mpower/repository/revisions/master/entry/python/mpower.py
+
+
+import subprocess
+import sys
+import json
+
+import pycurl
+
+def munin_print(s):
+    """ Munin, until 2.1.1 accept only latin1
+
+    See https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=598554
+
+    :param s: unicode string to be printed
+    """
+    print(s.encode('latin1'))
+
+class MPower:
+    class APIError(Exception):
+        def __str__(self):
+            return 'Error querying mPower API: {}'.format(
+                super(Exception, self).__str__())
+
+
+    def __init__(self, host):
+        self.contents = ''
+        self.host = host
+        self.handle = pycurl.Curl()
+        self.handle.setopt(self.handle.AUTOREFERER, 1)
+        self.handle.setopt(self.handle.FOLLOWLOCATION, 1)
+        self.handle.setopt(self.handle.COOKIEFILE, "")
+        self.handle.setopt(self.handle.WRITEFUNCTION, self.body_callback)
+
+    def __del__(self):
+        self.handle.close()
+
+    def body_callback(self, buf):
+        self.contents = self.contents + buf
+
+    def login(self, user, password):
+        self.contents = ''
+        self.handle.setopt(self.handle.URL,
+                           "http://" + self.host + "/index.cgi")
+        try:
+            self.handle.perform()
+        except pycurl.error as e:
+            raise self.APIError(
+                'mPower HTTP seems unreachable: "{}"'.format(e.args[1]))
+        self.handle.setopt(self.handle.POSTFIELDS,
+                           "username="+user +"&password="+password)
+        self.handle.setopt(self.handle.URL,
+                           "http://" + self.host + "/login.cgi")
+        self.handle.perform()
+        if (self.handle.getinfo(self.handle.RESPONSE_CODE) != 200):
+            raise APIError('Login page error')
+        if (str.find(self.contents, "Invalid credentials.") > 0):
+            raise APIError('Login page error')
+
+    def query_outputs(self):
+        self.contents = ''
+        self.handle.setopt(self.handle.URL,
+                           "http://"+self.host+"/mfi/sensors.cgi")
+        self.handle.setopt(self.handle.CUSTOMREQUEST, "GET")
+        self.handle.setopt(self.handle.HTTPGET, 1)
+        self.handle.perform()
+        decoded = json.loads(self.contents);
+        if (decoded['status'] != "success"):
+            raise APIError('mPower API returned status {}'.format(decoded['status']))
+        return decoded['sensors']
+
+
+class PluginError(Exception):
+    def __str__(self):
+        return 'Error calling plugin: {}'.format(
+            super(Exception, self).__str__())
+
+
+def print_values(mpower):
+    data = mpower.query_outputs()
+    for row in data:
+        munin_print(u'current-{port}.value {current}'.format(**row))
+
+
+def print_config(mpower):
+    data = mpower.query_outputs()
+
+    munin_print(
+        u'graph_title Courant consommé (mPower {})'.format(
+            mpower.host))
+    munin_print(u'graph_vlabel Ampères')
+    munin_print(u'graph_category sensors')
+    munin_print(u'graph_info Courant consommé, par prise')
+    munin_print(u'graph_total Total')
+    for row in data:
+        munin_print(u'current-{port}.label {label}'.format(**row))
+        munin_print(u'current-{port}.draw LINE'.format(**row))
+
+
+def main():
+    script_name, mpower_ip = sys.argv[0].rsplit('_', 1)
+
+    if not mpower_ip:
+        raise PluginError('This plugin symlink must include the host name of the mpower, ex: "mpower_10.10.10.10"')
+
+    mpower = MPower(mpower_ip)
+    mpower.login('readonly', 'readonly')
+
+    if (len(sys.argv) > 1) and sys.argv[1] == 'config':
+        print_config(mpower)
+    else:
+        print_values(mpower)
+
+
+if __name__ == '__main__':
+    try:
+        main()
+    except Exception as e:
+        sys.stderr.write('{}\n'.format(e))
+        exit(1)
