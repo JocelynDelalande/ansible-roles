@@ -4,7 +4,8 @@ After=network.target
 
 [Service]
 WorkingDirectory=/opt/jupyterhub/
-ExecStart=/opt/jupyter/venv/bin/jupyterhub
+ExecStart=/opt/jupyterhub/venv/bin/jupyterhub --JupyterHub.spawner_class=sudospawner.SudoSpawner
+User=jupyterhub
 
 [Install]
 WantedBy=multi-user.target

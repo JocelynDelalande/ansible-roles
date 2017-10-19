@@ -1,19 +1,59 @@
 - name: install apt dependencies
-  apt: pkg={{ item }}
+  apt: pkg={{ item }} update_cache=yes cache_valid_time=1800
   with_items:
     - npm
     - nodejs-legacy
+    - virtualenv
+    - python3-dev
 
 - name: create dedicated user
-  user: name=jupyterhub home=/opt/jupyterhub
+  user:
+    name: jupyterhub
+    home: /opt/jupyterhub
 
-- name: install jupyterhub
-  pip: name=jupyterhub virtualenv=/opt/jupyterhub/venv
+- name: ensure jupyterhub-users group exists
+  group:
+    name: jupyterhub-users
+    state: present
+
+- name: install pip dependencies
+  pip:
+    name: "{{ item }}"
+    virtualenv: /opt/jupyterhub/venv
+    virtualenv_python: python3
+  with_items:
+    - jupyterhub
+    - sudospawner
   become: jupyterhub
   notify: restart jupyterhub
+
+- name: Install npm deps
+  npm:
+    name: configurable-http-proxy
+    global: yes
+
+- name: Authorize jupyterhub to spawn notebooks for jupyterhub-users members
+  copy:
+    content: "jupyterhub ALL = (%jupyterhub-users) NOPASSWD: /opt/jupyterhub/venv/bin/sudospawner\n"
+    dest: /etc/sudoers.d/50-jupyterhub
+    mode: 0440
+    validate: visudo -cf %s
+
+# Adding jupyterhub to shadow group would not be the right thing, as it gives
+# too much power.
+- name: authorize jupyterhub to do PAM auth
+  acl:
+    path: /etc/shadow
+    entry: "user:jupyterhub:r"
+    state: present
 
 - name: systemd script is in place
   template:
     src: jupyterhub.service.j2
     dest: /etc/systemd/system/jupyterhub.service
-  notify: restart jupyterhub
+  notify:
+    - restart jupyterhub
+    - reload systemd
+
+- name: jupyterhub is started
+  service: name=jupyterhub state=started
