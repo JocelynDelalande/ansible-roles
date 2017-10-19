@@ -13,19 +13,32 @@
   with_items:
     - /etc/nginx/sites-enabled/default
 
+- name: snakeoil certificates are in place (used when LE certificates have not been generated yet)
+  command: openssl req -x509 -nodes -subj '/CN=localhost' -newkey rsa:4096 -keyout snakeoil.key -out snakeoil.crt -days 4096
+  args:
+    chdir: /etc/nginx
+    creates: /etc/nginx/snakeoil.crt
+  notify: Restart nginx
+
+- name: checking if letsencrypt certificates are available for our vhosts
+  stat: path="/etc/letsencrypt/live/{{ item.domain }}"
+  with_items: "{{ nginx_vhosts }}"
+  when: item.type == "https"
+  register: letsencrypt_certificate_folders_exist
+
 - name: Install vhosts settings
   template:
     src: vhost.j2
-    dest: "/etc/nginx/sites-available/{{ item.nick|default(item.domain) }}-{{ item.type }}"
-  with_items: '{{ nginx_vhosts }}'
+    dest: "/etc/nginx/sites-available/{{ item.item.nick|default(item.item.domain) }}-{{ item.item.type }}"
+  with_items: "{{ letsencrypt_certificate_folders_exist.results }}"
   notify: Restart nginx
 
 - name: Enable vhosts
   file:
-    src: "/etc/nginx/sites-available/{{ item.nick|default(item.domain) }}-{{ item.type }}"
-    dest: "/etc/nginx/sites-enabled/{{ item.nick|default(item.domain) }}-{{ item.type }}"
+    src: "/etc/nginx/sites-available/{{ item.item.nick|default(item.item.domain) }}-{{ item.item.type }}"
+    dest: "/etc/nginx/sites-enabled/{{ item.item.nick|default(item.item.domain) }}-{{ item.item.type }}"
     state: link
-  with_items: '{{ nginx_vhosts }}'
+  with_items: "{{ letsencrypt_certificate_folders_exist.results }}"
   notify: Restart nginx
 
 - name: Start nginx

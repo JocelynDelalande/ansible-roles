@@ -1,41 +1,46 @@
 # {{ ansible_managed }}
 
 server {
-{% if item.type == 'http' %}
+{% if item.item.type == 'http' %}
   listen [::]:80;
-{% elif item.type == 'https' %}
+{% elif item.item.type == 'https' %}
   listen [::]:443;
 {% endif %}
-  server_name {{ item.domain }};
+  server_name {{ item.item.domain }};
 
-{% if item.type == 'https' %}
+{% if item.item.type == 'https' %}
   ssl on;
-  ssl_certificate /etc/letsencrypt/live/{{ item.domain }}/fullchain.pem;
-  ssl_certificate_key /etc/letsencrypt/live/{{ item.domain }}/privkey.pem;
+  {% if item.stat.exists %}
+    ssl_certificate /etc/letsencrypt/live/{{ item.item.domain }}/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/{{ item.item.domain }}/privkey.pem;
+  {% else %}
+    ssl_certificate /etc/nginx/snakeoil.crt;
+    ssl_certificate_key /etc/nginx/snakeoil.key;
+  {% endif %}
 {% endif %}
 
-  access_log /var/log/nginx/{{ item.nick|default(item.domain) }}-{{ item.type }}.access.log;
+  access_log /var/log/nginx/{{ item.item.nick|default(item.item.domain) }}-{{ item.item.type }}.access.log;
 {% if ansible_lsb.codename !=  "wheezy" %}
-  error_log /var/log/nginx/{{ item.nick|default(item.domain) }}-{{ item.type }}.error.log;
+  error_log /var/log/nginx/{{ item.item.nick|default(item.item.domain) }}-{{ item.item.type }}.error.log;
 {% endif %}
 
-{% if item.features is defined %}
+{% if item.item.features is defined %}
 
-  {% if 'no-robots' in item.features %}
+  {% if 'no-robots' in item.item.features %}
 
   location /robots.txt {
     return 200 "User-agent: *\nDisallow: /";
   }
   {% endif %}
 
-  {% if 'letsencrypt-check' in item.features %}
+  {% if 'letsencrypt-check' in item.item.features %}
 
   location /.well-known/acme-challenge {
     root /var/www/letsencrypt_webroot;
   }
   {% endif %}
 
-  {% if 'ssl-redirection' in item.features %}
+  {% if 'ssl-redirection' in item.item.features %}
 
   location / {
     rewrite ^ https://$http_host$request_uri? permanent;
@@ -44,20 +49,20 @@ server {
 
 {% endif %}
 
-{% for k,v in item.vars|default([]) %}
+{% for k,v in item.item.vars|default([]) %}
 
   {{ k }} {{ v }};
 {% endfor %}
 
-{% for location in item.locations|default([]) %}
+{% for location in item.item.locations|default([]) %}
 
   location {{ location.path }} {
   {% if location.type == 'fastcgi' %}
 
     fastcgi_param CONTENT_LENGTH $content_length;
     fastcgi_param CONTENT_TYPE $content_type;
-    fastcgi_param HTTP_SCHEME {{ item.type }};
-    fastcgi_param HTTPS {% if item.type == 'https' %}True{% else %}False{% endif %};
+    fastcgi_param HTTP_SCHEME {{ item.item.type }};
+    fastcgi_param HTTPS {% if item.item.type == 'https' %}True{% else %}False{% endif %};
     fastcgi_param PATH_INFO $fastcgi_script_name;
     fastcgi_param QUERY_STRING $query_string;
     fastcgi_param REQUEST_METHOD $request_method;
