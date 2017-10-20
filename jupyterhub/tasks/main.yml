@@ -47,13 +47,36 @@
     entry: "user:jupyterhub:r"
     state: present
 
+- name: authorize jupyterhub to log events in lastlog
+  acl:
+    path: /var/log/lastlog
+    entry: "user:jupyterhub:rw"
+    state: present
+
+- name: make sure dedicated ro-dirs exist
+  file: path={{item}}/ state=directory owner=root mode=0755
+  with_items:
+    - /etc/jupyterhub
+    - /etc/jupyter/templates
+
+- name: make sure dedicated rw-dirs exist
+  file: path={{ item }} state=directory owner=jupyterhub mode=0755
+  with_items:
+    - /var/log/jupyterhub
+
+- name: install custom config file
+  template:
+    src: jupyterhub_config.py.j2
+    dest: /etc/jupyter/jupyterhub_config.py
+  notify: restart jupyterhub
+
 - name: systemd script is in place
   template:
     src: jupyterhub.service.j2
     dest: /etc/systemd/system/jupyterhub.service
   notify:
-    - restart jupyterhub
     - reload systemd
+    - restart jupyterhub
 
 - name: jupyterhub is started
   service: name=jupyterhub state=started

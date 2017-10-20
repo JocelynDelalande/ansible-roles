@@ -1,0 +1,5 @@
+- name: restart jupyterhub
+  service: name=jupyterhub state=restarted
+
+- name: reload systemd
+  command: systemctl daemon-reload

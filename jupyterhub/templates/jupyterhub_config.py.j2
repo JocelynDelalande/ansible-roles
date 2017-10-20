@@ -1,0 +1,11 @@
+# {{ ansible_managed }}
+# Configuration file for jupyterhub.
+
+## Avoid listening on iternet (we have a nginx for that)
+c.JupyterHub.ip = '127.0.0.1'
+
+## Use our in-venv sudospawner
+c.SudoSpawner.sudospawner_path = '/opt/jupyterhub/venv/bin/sudospawner'
+
+## Restrict users able to log in to a unix group
+c.PAMAuthenticator.group_whitelist = ['jupyterhub-users']
