@@ -1,11 +1,28 @@
 # {{ ansible_managed }}
 # Configuration file for jupyterhub.
 
+### GLOBAL ###
+
 ## Avoid listening on iternet (we have a nginx for that)
 c.JupyterHub.ip = '127.0.0.1'
 
+
+## Grant admin users permission to access single-user servers.
+c.JupyterHub.admin_access = True
+
+
+### SPAWNER ###
+
 ## Use our in-venv sudospawner
 c.SudoSpawner.sudospawner_path = '/opt/jupyterhub/venv/bin/sudospawner'
+c.SudoSpawner.debug = True
+c.SudoSpawner.mem_limit = '2M'
+c.Spawner.debug = True  # redundant ?
+c.Spawner.KernelSpecManager.whitelist = {'javascript'}
+c.Spawner.notebook_dir = '~/notebooks'
 
+
+### AUTH ###
 ## Restrict users able to log in to a unix group
 c.PAMAuthenticator.group_whitelist = ['jupyterhub-users']
+c.Authenticator.admin_users = set('jdoe')
