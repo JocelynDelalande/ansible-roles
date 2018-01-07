@@ -1,0 +1,7 @@
+# Jessie-backports contains a recent version of nodejs… But without any npm…
+# The nodesource version contains a npm binary
+# Not that it seems not required for Debian stretch
+- name: Install npm deps
+  npm:
+    name: ijavascript
+    global: yes

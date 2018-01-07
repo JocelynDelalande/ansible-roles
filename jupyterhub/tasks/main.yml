@@ -88,3 +88,6 @@
 
 - name: jupyterhub is started
   service: name=jupyterhub state=started
+
+- name: Install ijavascript notebook kernel
+  include: ijavascript.yml
