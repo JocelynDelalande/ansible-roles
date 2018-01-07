@@ -75,7 +75,7 @@
 - name: install custom config file
   template:
     src: jupyterhub_config.py.j2
-    dest: /etc/jupyter/jupyterhub_config.py
+    dest: /etc/jupyterhub/jupyterhub_config.py
   notify: restart jupyterhub
 
 - name: systemd script is in place
