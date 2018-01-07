@@ -1,6 +1,6 @@
 #!/bin/sh
 
-btrfs balance start /
+#btrfs balance start /
 
 # FIXME: who receives notification email about failed scrub ?
 btrfs scrub start /
