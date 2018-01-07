@@ -16,6 +16,7 @@
 - name: create dedicated user
   user:
     name: jupyterhub
+    groups: shadow  # so that it can authenticate others with PAM
     home: /opt/jupyterhub
 
 - name: ensure jupyterhub-users group exists
