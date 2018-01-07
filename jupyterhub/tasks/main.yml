@@ -1,8 +1,15 @@
+# This first task is actually required by ijavascript
+# to get a recent version of node (jessie-backports contains one, but with no
+# npm…)
+# Seems un-needed on strecth (but not tested)
+- name: Install node from nodesource as ijs wont run with node 0.10x
+  include: nodesource.yml
+
 - name: install apt dependencies
   apt: pkg={{ item }} update_cache=yes cache_valid_time=1800
   with_items:
-    - npm
-    - nodejs-legacy
+    #- npm           # Taken care by nodesource step
+    #- nodejs-legacy # Taken care by nodesource step
     - virtualenv
     - python3-dev
 
