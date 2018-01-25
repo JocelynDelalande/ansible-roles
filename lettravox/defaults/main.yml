@@ -15,3 +15,4 @@ lettravox_venv_bin_path: "{{ lettravox_venv_dir }}/bin"
 
 lettravox_admins: []
 lettravox_httpd_user: www-data
+lettravox_from_email: 'no-reply@lettravox.example.com'
