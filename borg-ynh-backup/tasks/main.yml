@@ -9,7 +9,7 @@
     ssh_key_file: "{{ borg_ynh_backup_ssh_key }}"
     ssh_key_comment: "borg backup {{ borg_ynh_backup_user }}@{{ ansible_hostname }}"
 
-- include: passphrase.yml
+- import_tasks: passphrase.yml
   tags: [borg.passphrase]
 
 - name: Create scripts directory

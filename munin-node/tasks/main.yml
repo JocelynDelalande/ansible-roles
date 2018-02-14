@@ -5,7 +5,7 @@
     - munin-node
     - smartmontools
 
-- include: custom-plugins.yml
+- import_tasks: custom-plugins.yml
 
 - name: Allow our munin-master(s)
   blockinfile:

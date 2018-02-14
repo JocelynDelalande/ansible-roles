@@ -1,7 +1,7 @@
 - name: Setup rsync backup client
-  include: setup.yml
+  import_tasks: setup.yml
   when: not rsync_backup_client_disable
 
 - name: Disable rsync backup client
-  include: disable.yml
+  import_tasks: disable.yml
   when: rsync_backup_client_disable

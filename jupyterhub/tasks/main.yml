@@ -3,7 +3,7 @@
 # npm…)
 # Seems un-needed on strecth (but not tested)
 - name: Install node from nodesource as ijs wont run with node 0.10x
-  include: nodesource.yml
+  import_tasks: nodesource.yml
 
 - name: install apt dependencies
   apt: pkg={{ item }} update_cache=yes cache_valid_time=1800
@@ -90,4 +90,4 @@
   service: name=jupyterhub state=started
 
 - name: Install ijavascript notebook kernel
-  include: ijavascript.yml
+  import_tasks: ijavascript.yml

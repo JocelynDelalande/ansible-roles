@@ -7,4 +7,4 @@
     - Reload udev rules
     - WARNING Unplug/replug your scanner to get right permissions
 
-- include: scanbuttond.yml
+- import_tasks: scanbuttond.yml

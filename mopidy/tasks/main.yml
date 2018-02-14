@@ -1,4 +1,4 @@
-- include: cifs.yml
+- import_tasks: cifs.yml
 
 - name: Add mopidy APT repository
   apt_repository: repo='deb http://apt.mopidy.com/ stable main contrib non-free' state=present

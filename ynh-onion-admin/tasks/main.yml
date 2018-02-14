@@ -1,2 +1,2 @@
-- include: tor.yml
-- include: nginx.yml
+- import_tasks: tor.yml
+- import_tasks: nginx.yml

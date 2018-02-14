@@ -1,7 +1,7 @@
 - name : Install borg via pip
-  include: pip_install.yml
+  import_tasks: pip_install.yml
   when: borg_install_method == 'pip'
 
 - name: Install borg via apt
-  include: apt_install.yml
+  import_tasks: apt_install.yml
   when: (borg_install_method == 'apt') and (ansible_lsb.codename == 'jessie')
