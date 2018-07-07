@@ -1,16 +1,7 @@
-lxc.rootfs = /var/lib/lxc/{{ item.name }}/rootfs
+{% if item.lxc.version == 'jessie' %}
 lxc.tty = 4
 lxc.pts = 1024
-lxc.arch = amd64
-lxc.utsname = {{ item.name }}
 lxc.cap.drop = sys_module mac_admin mac_override sys_time
-lxc.network.type = veth
-lxc.network.flags = up
-lxc.network.link = br-dmz
-lxc.network.hwaddr = {{ item.mac }}
-{% if item.lxc.autostart|default(False) %}
-lxc.start.auto = 1
-{% endif %}
 
 # Default policy: deny everything and allow mknod without perms
 lxc.cgroup.devices.deny = a
@@ -28,6 +19,23 @@ lxc.cgroup.devices.allow = c 1:8 rwm   # /dev/random
 lxc.cgroup.devices.allow = c 5:2 rwm   # /dev/ptmx
 lxc.cgroup.devices.allow = c 254:0 rwm  # /dev/rtc0
 lxc.cgroup.devices.allow = c 136:* rwm # /dev/pts*
+{% else %}
+# Distribution configuration
+lxc.include = /usr/share/lxc/config/debian.common.conf
+{% endif %}
+
+lxc.arch = amd64 # linux64?
+lxc.rootfs = /var/lib/lxc/{{ item.name }}/rootfs
+lxc.rootfs.backend = btrfs
+lxc.utsname = {{ item.name }}
+
+lxc.network.type = veth
+lxc.network.flags = up
+lxc.network.link = br-dmz
+lxc.network.hwaddr = {{ item.mac }}
+{% if item.lxc.autostart|default(False) %}
+lxc.start.auto = 1
+{% endif %}
 
 {% if 'pts' in item.lxc.features|default([]) %}
 
@@ -51,7 +59,6 @@ lxc.cgroup.devices.allow = c 4:7 rwm # dev/tty7
 lxc.cgroup.devices.allow = c 4:8 rwm # dev/tty8
 lxc.cgroup.devices.allow = c 4:9 rwm # dev/tty9
 lxc.cgroup.devices.allow = c 4:10 rwm # dev/tty10
-
 {% endif %}
 
 {% if 'audio' in item.lxc.features|default([]) %}
@@ -76,9 +83,6 @@ lxc.cgroup.devices.allow = c 248:* rwm # /dev/lirc*
 lxc.mount.entry = /dev/lirc0 dev/lirc0 none bind,optional,create=file
 {% endif %}
 
-{% if item.lxc.distro == 'debian' %}{% if item.lxc.version == 'jessie' %}
-lxc.autodev = 1
-lxc.kmsg = 0
-{% endif %}{% endif %}
-
+{% if 'dangerous' in item.lxc.features|default([]) %}
 lxc.seccomp = /usr/share/lxc/config/common.seccomp
+{% endif %}

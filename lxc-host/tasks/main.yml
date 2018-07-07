@@ -1,6 +1,5 @@
 - name: Install lxc packages
-  # Only jessie-backports offers both lxc and python-lxc
-  apt: pkg={{ item }} state=installed default_release=jessie-backports
+  apt: pkg={{ item }} state=installed
   with_items:
     - lxc
     - python-lxc
