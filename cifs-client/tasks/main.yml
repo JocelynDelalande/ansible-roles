@@ -7,7 +7,7 @@
     dest: "/etc/fstab.{{ item.name }}.creds"
     mode: 0600
     owner: root
-  with_items: cifs_mounts
+  with_items: "{{ cifs_mounts }}"
 
 - name: Ensure CIFS mount is present
   mount:
@@ -16,4 +16,4 @@
     fstype: cifs
     opts: "credentials=/etc/fstab.{{ item.name }}.creds,iocharset=utf8,uid={{ item.localuser }},gid={{ item.localgroup }}"
     state: mounted
-  with_items: cifs_mounts
+  with_items: "{{ cifs_mounts }}"
