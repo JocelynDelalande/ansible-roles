@@ -48,7 +48,7 @@ Plusieurs clefs sont disponibles pour chaque vhost de la liste *nginx_vhosts*.
       provided in *target* property
     - *reverse-proxy* : proxies the traffic to another HTTP server whose
       address is provided in *target* property.  est précisée dans *target*
-    - *reverse-proxy-websockets* : same, but also proxies websockets
+    - *reverse-proxy-websocket* : same, but also proxies websockets
     - *static* : serve a static files folder whose path is provided in *target*
       property précisé dans *target*
     - *domain-redirection* : redirects (301) to another domain mentioned in
