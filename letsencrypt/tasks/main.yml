@@ -15,7 +15,7 @@
       update_cache: yes
       cache_valid_time: 1800
       default_release: "{% if ansible_distribution_release == 'jessie'%}jessie-backports{% endif %}"
-    when: ansible_lsb.codename == "jessie"
+    when: ansible_lsb.codename in ("jessie", "stretch")
 
   - name: Ensure webroot exists
     file: path="{{ letsencrypt_webroot_path }}" state=directory recurse=yes mode="a+rw"
