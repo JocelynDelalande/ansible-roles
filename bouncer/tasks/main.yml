@@ -8,25 +8,25 @@
 
 - name: create users if not existents
   user: name="{{ item.unix_login }}" shell=/bin/bash
-  with_items: bouncer_users
+  with_items: "{{ bouncer_users }}"
 
 - name: make dir conf
   file:
     dest: "~{{ item.unix_login }}/.irssi/certs"
     state: directory
     recurse: yes
-  with_items: bouncer_users
+  with_items: "{{ bouncer_users }}"
 
 - name: deploy ssh access
   authorized_key:
     user: "{{ item.unix_login }}"
     key: "{{ item.ssh_key }}"
-  with_items: bouncer_users
+  with_items: "{{ bouncer_users }}"
 
 - name: Deploy irssi settings
   template: src=irssi.conf.j2 dest="~{{ item.unix_login }}/.irssi/config"
-  with_items: bouncer_users
+  with_items: "{{ bouncer_users }}"
 
 - name: Deploy CAs
   copy: src="CAs.pem" dest="~{{ item.unix_login }}/.irssi/certs/CAs.pem"
-  with_items: bouncer_users
+  with_items: "{{ bouncer_users }}"

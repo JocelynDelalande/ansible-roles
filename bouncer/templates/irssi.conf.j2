@@ -4,7 +4,7 @@ servers = (
     chatnet = "FreeNode";
     port = "6667";
     autoconnect = "yes";
-        autosendcmd = "{{ vaulted_freenode_register_cmd }}"
+        autosendcmd = "{{ vaulted_freenode_register_cmd }}";
   },
   {
     address = "irc.geeknode.org";
@@ -12,38 +12,16 @@ servers = (
     port = "6667";
     autoconnect = "yes";
   },
-  {
-    address = "irc.rhien.org";
-    chatnet = "rhien";
-    port = "6667";
-    use_ssl = "no";
-    ssl_verify = "no";
-    autoconnect = "yes";
-  },
-  {
-    address = "irc.united-irc.com";
-    chatnet = "UnitedIRC";
-    port = "6667";
-    use_ssl = "no";
-    ssl_verify = "no";
-  },
-  {
-    address = "irc.rezosup.org";
-    chatnet = "rezosup";
-    port = "6667";
-    use_ssl = "no";
-    ssl_verify = "no";
-  },
-  {
-    address = "irc.oftc.net";
-    chatnet = "OFTC";
-    port = "6697";
-    use_ssl = "yes";
-    ssl_cert = "~/.irssi/certs/nick.pem";
-    ssl_verify = "yes";
-    ssl_cafile = "~/.irssi/certs/CAs.pem";
-    autoconnect = "yes";
-  }
+  # {
+  #   address = "irc.oftc.net";
+  #   chatnet = "OFTC";
+  #   port = "6697";
+  #   use_ssl = "yes";
+  #   ssl_cert = "~/.irssi/certs/nick.pem";
+  #   ssl_verify = "yes";
+  #   ssl_cafile = "~/.irssi/certs/CAs.pem";
+  #   autoconnect = "yes";
+  # }
 );
 
 
@@ -51,28 +29,15 @@ port = "6667";
 chatnets = {
   FreeNode = { type = "IRC"; };
   GeekNode = { type = "IRC"; };
-  RHIEN = { type = "IRC"; };
-  OFTC = { type = "IRC"; };
-  UnitedIRC = { type = "IRC"; };
-  rezosup = { type = "IRC"; };
+#  OFTC = { type = "IRC"; };
 };
 
 channels = (
-  #  { name = "#rhien"; chatnet = "RHIEN"; autojoin = "Yes"; },
-  # { name = "#calvix"; chatnet = "FreeNode"; autojoin = "Yes"; },
-  {
-    name = "#tetaneutral.net";
-    chatnet = "FreeNode";
-    autojoin = "Yes";
-  },
-  { name = "#rhizome"; chatnet = "FreeNode"; autojoin = "Yes"; },
-  { name = "#ilico"; chatnet = "FreeNode"; autojoin = "Yes"; },
-  { name = "#gitoyen" chatnet = "GeekNode"; autojoin = "Yes"; },
-  #  { name = "#osm-fr"; chatnet = "OFTC"; autojoin = "Yes"; },
+  { name = "#tetaneutral.net"; chatnet = "FreeNode"; autojoin = "Yes";},
   { name = "#fdn"; chatnet = "GeekNode"; autojoin = "Yes"; },
   { name = "#ffdn"; chatnet = "GeekNode"; autojoin = "Yes"; },
-  { name = "#federez"; chatnet = "rezosup"; autojoin = "Yes"; },
-  { name = "#faimaison"; chatnet = "GeekNode"; autojoin = "Yes"; }
+  { name = "#faimaison"; chatnet = "GeekNode"; autojoin = "Yes"; },
+  { name = "#mailpile"; chatnet = "FreeNode"; autojoin = "Yes"; },
 );
 
 aliases = {
@@ -177,10 +142,11 @@ statusbar = {
       # list of items in statusbar in the display order
       items = {
         user = { };
-                window = { };
-                act = { priority = "10"; };
+        window = { };
+        act = { priority = "10"; };
         more = { priority = "-1"; alignment = "right"; };
         barend = { priority = "100"; alignment = "right"; };
+        otr = { };
       };
     };
 
