@@ -20,12 +20,12 @@
 
 - name: Add NodeSource deb repository
   apt_repository:
-    repo: 'deb https://deb.nodesource.com/node_4.x {{ ansible_distribution_release }} main'
+    repo: 'deb https://deb.nodesource.com/node_8.x {{ ansible_distribution_release }} main'
     state: present
 
 - name: Add NodeSource deb-src repository
   apt_repository:
-    repo: 'deb-src https://deb.nodesource.com/node_4.x {{ ansible_distribution_release }} main'
+    repo: 'deb-src https://deb.nodesource.com/node_8.x {{ ansible_distribution_release }} main'
     state: present
 
 - name: Add NodeSource repository preferences
