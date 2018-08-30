@@ -15,7 +15,7 @@ Variables
   documented in *Vhosts configuration*.
 
 
-### Optionelle
+### Optional
 
 - *nginx_letsencrypt_webroot* : where *.well-known* folder (containing
   challenges proofs) will be stored (default */var/www*)
