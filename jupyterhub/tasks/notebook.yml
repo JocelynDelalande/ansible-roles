@@ -1,0 +1,57 @@
+- name: Install jupyter notebook
+  pip:
+    # Could switch to stable release once PR is merged
+    # https://github.com/jupyter/notebook/pull/3888
+    name: "git+https://github.com/JocelynDelalande/notebook.git@jd-french-i18n#egg=notebook"
+    virtualenv: /opt/jupyterhub/venv
+  become: jupyterhub
+  notify: restart jupyterhub
+  register: updated_notebook
+
+- name: Install pybabel
+  # Could drop this step once issue is fixed
+  # https://github.com/jupyter/notebook/issues/3102
+  pip:
+    name: babel
+    virtualenv: /opt/jupyterhub/venv
+  become: jupyterhub
+  when: jupyterhub_locale
+
+- name: Install po2json
+  # A recent version is required for -p option
+  # Could drop this step once issue is fixed
+  # https://github.com/jupyter/notebook/issues/3102
+  npm:
+    name: po2json
+    global: yes
+  when: jupyterhub_locale
+
+- name: Get i18n path
+  # Could drop this step once issue is fixed
+  # https://github.com/jupyter/notebook/issues/3102
+  command: "/opt/jupyterhub/venv/bin/python -c 'import notebook.i18n;print(notebook.i18n.__path__[0])'"
+  register: i18n_path
+  when: jupyterhub_locale
+
+- name: Compile translations (.po → .mo)
+  # Could drop this step once issue is fixed
+  # https://github.com/jupyter/notebook/issues/3102
+  command: "/opt/jupyterhub/venv/bin/pybabel compile -D notebook -f -l {{ jupyterhub_locale }} -i {{ jupyterhub_locale }}/LC_MESSAGES/{{ item }}.po -o {{ jupyterhub_locale }}/LC_MESSAGES/{{ item }}.mo"
+  args:
+    chdir: "{{ i18n_path.stdout }}"
+  with_items:
+    - notebook
+    - nbui
+  when: updated_notebook.changed and jupyterhub_locale
+  notify: restart jupyterhub
+  become: jupyterhub
+
+- name: Compile translations (.po → .json)
+  # Could drop this step once issue is fixed
+  # https://github.com/jupyter/notebook/issues/3102
+  command: "po2json -p -F -f jed1.x -d nbjs {{ jupyterhub_locale }}/LC_MESSAGES/nbjs.po {{ jupyterhub_locale }}/LC_MESSAGES/nbjs.json"
+  args:
+    chdir: "{{ i18n_path.stdout }}"
+  when: updated_notebook.changed and jupyterhub_locale
+  notify: restart jupyterhub
+  become: jupyterhub

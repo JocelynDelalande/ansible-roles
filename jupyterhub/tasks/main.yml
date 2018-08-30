@@ -1,8 +1,7 @@
-# This first task is actually required by ijavascript
-# to get a recent version of node (jessie-backports contains one, but with no
-# npm…)
-# Seems un-needed on strecth (but not tested)
-- name: Install node from nodesource as ijs wont run with node 0.10x
+# This first task is actually required by ijavascript to get a recent version
+# of node (jessie-backports and stretch contains a recent one, but lacking npm)
+#
+- name: Install node from nodesource
   import_tasks: nodesource.yml
 
 - name: install apt dependencies
@@ -34,6 +33,9 @@
     - sudospawner
   become: jupyterhub
   notify: restart jupyterhub
+
+- name: install jupyter notebook (with french translation)
+  include: notebook.yml
 
 - name: Install npm deps
   npm:
@@ -78,6 +80,9 @@
     dest: /etc/jupyterhub/jupyterhub_config.py
   notify: restart jupyterhub
 
+- name: Install ijavascript notebook kernel
+  import_tasks: ijavascript.yml
+
 - name: systemd script is in place
   template:
     src: jupyterhub.service.j2
@@ -89,5 +94,3 @@
 - name: jupyterhub is started
   service: name=jupyterhub state=started
 
-- name: Install ijavascript notebook kernel
-  import_tasks: ijavascript.yml

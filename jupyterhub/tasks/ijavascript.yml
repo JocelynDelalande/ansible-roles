@@ -3,5 +3,18 @@
 # Not that it seems not required for Debian stretch
 - name: Install npm deps
   npm:
-    name: ijavascript
+    name: "{{ item }}"
     global: yes
+  with_items:
+    - ijavascript
+    - fibers # for synchronous functions
+
+- name: Install ijavascript kernel for notebooks
+  shell: "ijsinstall --install=global --startup-script=/opt/jupyterhub/js-startup.js"
+  environment:
+    PATH: "/opt/jupyterhub/venv/bin:{{ ansible_env.PATH }}"
+
+- name: Deploy custom startup script (with custom sync functions for learning)
+  template:
+    src: js-startup.js
+    dest: /opt/jupyterhub/js-startup.js

@@ -3,7 +3,7 @@
 
 ### GLOBAL ###
 
-## Avoid listening on iternet (we have a nginx for that)
+## Avoid listening on Internet (we have a nginx for that)
 c.JupyterHub.ip = '127.0.0.1'
 
 
@@ -13,14 +13,20 @@ c.JupyterHub.admin_access = True
 
 ### SPAWNER ###
 
-## Use our in-venv sudospawner
+## Specific spawner config (our in-venv sudospawner)
 c.SudoSpawner.sudospawner_path = '/opt/jupyterhub/venv/bin/sudospawner'
-c.SudoSpawner.debug = True
-c.SudoSpawner.mem_limit = '2M'
-c.Spawner.debug = True  # redundant ?
+
+# Generic spawner config
+c.Spawner.mem_limit = '2M'
+c.Spawner.debug = True
 c.Spawner.KernelSpecManager.whitelist = {'javascript'}
 c.Spawner.notebook_dir = '~/notebooks'
-
+c.Spawner.environment = {
+    {% if jupyterhub_system_locale %}
+    'LANG': '{{ jupyterhub_system_locale }}',
+    {% endif %}
+    'NODE_PATH':'/usr/lib/node_modules',
+}
 
 ### AUTH ###
 ## Restrict users able to log in to a unix group
