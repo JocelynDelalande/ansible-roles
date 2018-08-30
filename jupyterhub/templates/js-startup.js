@@ -25,7 +25,7 @@ global.alert = function (msg) {
 var runInThisContext = vm.runInThisContext;
 
 vm.runInThisContext = function(code) {
-    runInThisContext("Fiber(function() {" + code + "}).run();");
+    runInThisContext("'use strict';Fiber(function() {" + code + "}).run();");
 };
 
 /** Synchronous sleep-like function for JavaScript
