@@ -1,8 +1,8 @@
 - name: Install rsync
-  apt: pkg=rsync state=installed
+  apt: pkg=rsync state=present
 
 - name: Install a recent version of btrfs-tools (from backports)
-  apt: pkg=btrfs-tools state=installed default_release=wheezy-backports
+  apt: pkg=btrfs-tools state=present default_release=wheezy-backports
 
 - name: Put rrsync in-place
   copy: src=rrsync dest=/usr/local/bin/rrsync mode=0555

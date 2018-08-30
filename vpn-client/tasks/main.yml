@@ -1,5 +1,5 @@
 - name: Install openvpn package
-  apt: pkg=openvpn state=installed
+  apt: pkg=openvpn state=present
 
 - name: Puts the vpn conf in place
   template: src=vpn-client.conf.j2 dest=/etc/openvpn/{{ vpn_name }}-client.conf

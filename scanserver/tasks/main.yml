@@ -1,5 +1,5 @@
 - name: Install sane utils
-  apt: pkg=sane-utils state=installed
+  apt: pkg=sane-utils state=present
 
 - name: Install propper udev rule
   action: copy src=80-scanner-permissions.rules dest=/etc/udev/rules.d/80-scanner-permissions.rules

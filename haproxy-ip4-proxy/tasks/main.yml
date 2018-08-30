@@ -1,5 +1,5 @@
 - name: Installs haproxy
-  apt: pkg=haproxy state=installed update_cache=yes cache_valid_time=3600
+  apt: pkg=haproxy state=present update_cache=yes cache_valid_time=3600
 
 - name: Set haproxy config
   template: src=haproxy.cfg.j2 dest=/etc/haproxy/haproxy.cfg

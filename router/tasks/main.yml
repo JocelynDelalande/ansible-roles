@@ -3,7 +3,7 @@
 #  notify: restart networking
 
 - name: Install vlan tools
-  apt: pkg=vlan state=installed
+  apt: pkg=vlan state=present
 
 - name: Load vlan module on boot
   copy: src=vlan-module.conf dest=/etc/modules-load.d/vlan.conf

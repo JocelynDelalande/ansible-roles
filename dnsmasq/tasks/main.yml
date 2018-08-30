@@ -1,5 +1,5 @@
 - name: Install dnsmasq package
-  apt: pkg=dnsmasq state=installed
+  apt: pkg=dnsmasq state=present
 
 - name: Puts the default init dnsmasq file
   template: src=default-dnsmasq.j2 dest=/etc/default/dnsmasq

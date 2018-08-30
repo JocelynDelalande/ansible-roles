@@ -1,5 +1,5 @@
 - name: Install rsync
-  apt: pkg=rsync state=installed
+  apt: pkg=rsync state=present
 
 - name: Check that ssh private key exists
   file:

@@ -1,8 +1,8 @@
 - name: Install hostapd
-  apt: pkg=hostapd state=installed
+  apt: pkg=hostapd state=present
 
 - name: Install ralink firmware
-  apt: pkg=firmware-ralink state=installed
+  apt: pkg=firmware-ralink state=present
 
 - name: Install hostapd config
   template: src=hostapd.conf.j2 dest=/etc/hostapd/hostapd.conf

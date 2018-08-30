@@ -1,7 +1,7 @@
 # scanbuttond do no longer exists in jessie
 # replaced by scanbuttond but not working with my scanner
 - name: Install scanbuttond (wheezy version)
-  apt: deb='http://ftp.fr.debian.org/debian/pool/main/s/scanbuttond/scanbuttond_0.2.3.cvs20090713-8_armel.deb' state=installed
+  apt: deb='http://ftp.fr.debian.org/debian/pool/main/s/scanbuttond/scanbuttond_0.2.3.cvs20090713-8_armel.deb' state=present
 
 # Prevent scanbuttond to be replaced with jessie dummy package
 - dpkg_selections:
@@ -9,7 +9,7 @@
     selection: hold
 
 - name: Install conversion tools
-  apt: pkg={{ item }} state=installed
+  apt: pkg={{ item }} state=present
   with_items:
     - libtiff-tools
     - imagemagick

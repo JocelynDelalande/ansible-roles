@@ -10,7 +10,7 @@
   apt_repository: repo='ppa:mc3man/trusty-media'
 
 - name: Install mopidy and codecs
-  apt: pkg={{ item }} state=installed update_cache=yes cache_valid_time=3600
+  apt: pkg={{ item }} state=present update_cache=yes cache_valid_time=3600
   with_items:
     - mopidy
     - gstreamer0.10-ffmpeg # from ppa:mc3man/trusty-media, for wma

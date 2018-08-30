@@ -1,5 +1,5 @@
 - name: install dependencies
-  apt: name={{ item }} force=yes state=installed
+  apt: name={{ item }} force=yes state=present
   with_items:
     - python
     - python-virtualenv
@@ -116,7 +116,7 @@
 
 
 - name: install supervisor
-  apt: pkg=supervisor state=installed
+  apt: pkg=supervisor state=present
 
 - name: set supervisord config
   template: src=supervisor.j2 dest=/etc/supervisor/conf.d/lettravox.conf mode=644

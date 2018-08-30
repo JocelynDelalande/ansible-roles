@@ -1,5 +1,5 @@
 - name: Install required package
-  apt: pkg=samba state=installed
+  apt: pkg=samba state=present
 
 - name: Put config file
   template: src=smb.conf.j2 dest=/etc/samba/smb.conf

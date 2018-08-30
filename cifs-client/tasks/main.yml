@@ -1,5 +1,5 @@
 - name: Install cifs-utils
-  apt: pkg=cifs-utils state=installed
+  apt: pkg=cifs-utils state=present
 
 - name: Install CIFS credentials file
   template:

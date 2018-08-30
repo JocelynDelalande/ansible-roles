@@ -1,5 +1,5 @@
 - name: Install cifs-utils
-  apt: pkg=cifs-utils state=installed
+  apt: pkg=cifs-utils state=present
 
 - name: Ensure CIFS mount is present
   mount:
