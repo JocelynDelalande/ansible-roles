@@ -1,5 +1,0 @@
-- name: restart transparency
-  supervisorctl: name=transparency state=restarted
-
-- name: restart supervisor
-  service: name=supervisor state=restarted
